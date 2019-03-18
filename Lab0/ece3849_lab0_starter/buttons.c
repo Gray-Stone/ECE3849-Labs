@@ -55,8 +55,8 @@ void ButtonInit(void)
 
     // GPIO PK6 = education booster pack mkII buttons 2
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOK);
-    GPIOPinTypeGPIOInput(GPIO_PORTK_BASE, GPIO_PIN_2);
-    GPIOPadConfigSet(GPIO_PORTK_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPinTypeGPIOInput(GPIO_PORTK_BASE, GPIO_PIN_6);
+    GPIOPadConfigSet(GPIO_PORTK_BASE, GPIO_PIN_6, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
     // GPIO PD4 = education booster pack mkII select
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
