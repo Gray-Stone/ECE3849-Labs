@@ -20,6 +20,7 @@
 
 // public globals
 volatile uint32_t gButtons = 0; // debounced button state, one per bit in the lowest bits
+uint32_t GPIO_STATE = 0;
                                 // button is pressed if its bit is 1, not pressed if 0
 uint32_t gJoystick[2] = {0};    // joystick coordinates
 uint32_t gADCSamplingRate;      // [Hz] actual ADC sampling rate
@@ -161,11 +162,11 @@ void ButtonISR(void) {
     // read hardware button state
     uint32_t gpio_buttons =
             ~GPIOPinRead(GPIO_PORTJ_BASE, 0xff) & (GPIO_PIN_1 | GPIO_PIN_0); // EK-TM4C1294XL buttons in positions 0 and 1
-    uint32_t but1 = (~GPIOPinRead(GPIO_PORTH_BASE, 0xff) & (GPIO_PIN_1)) << 1; //h1 -> OK
+    uint32_t but1 = (~GPIOPinRead(GPIO_PORTH_BASE, 0xff) & (GPIO_PIN_1)) << 1; //h1
     uint32_t but2 = (~GPIOPinRead(GPIO_PORTK_BASE, 0xff) & (GPIO_PIN_6)) >> 3; //k6
     uint32_t sel= (~GPIOPinRead(GPIO_PORTD_BASE, 0xff) & (GPIO_PIN_4)); //d4
 
-    gpio_buttons |= but1 | but2 | sel;
+    gpio_buttons |= but1 | but2 | sel; //OR the states of the buttons together
 
     uint32_t old_buttons = gButtons;    // save previous button state
     ButtonDebounce(gpio_buttons);       // Run the button debouncer. The result is in gButtons.
@@ -188,4 +189,7 @@ void ButtonISR(void) {
         if (tic) gTime++; // increment time every other ISR call
         tic = !tic;
     }
+
+    GPIO_STATE = gButtons; //update the button states to display on the screen
+
 }

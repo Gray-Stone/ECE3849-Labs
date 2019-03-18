@@ -40,7 +40,8 @@ int main(void)
     GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 
     uint32_t time, mins, secs, discsecs, centiseconds;  // local copy of gTime
-    char str[50];   // string buffer
+    char str1[50];   // string buffer line 1
+    char str2[50];  //string buffer line 2
     // full-screen rectangle
     tRectangle rectFullScreen = {0, 0, GrContextDpyWidthGet(&sContext)-1, GrContextDpyHeightGet(&sContext)-1};
 
@@ -55,9 +56,16 @@ int main(void)
         secs = ((time - centiseconds)/100); //8300 -> 83
         discsecs = secs % 60; //23
         mins =(secs / 60);
-        snprintf(str, sizeof(str), "Time = %02u:%02u:%02u", mins, discsecs, centiseconds); // convert time to string
+        snprintf(str1, sizeof(str1), "Time = %02u:%02u:%02u\0", mins, discsecs, centiseconds); //display the time
+        snprintf(str2, sizeof(str2), "%1u%1u%1u%1u%1u%1u%1u%1u%1u\0", //display the 9 LSb of the button states
+                 (GPIO_STATE>>8)&1, (GPIO_STATE>>7)&1,
+                 (GPIO_STATE>>6)&1, (GPIO_STATE>>5)&1,
+                 (GPIO_STATE>>4)&1, (GPIO_STATE>>3)&1,
+                 (GPIO_STATE>>2)&1, (GPIO_STATE>>1)&1,
+                  GPIO_STATE&1); // convert time to string
         GrContextForegroundSet(&sContext, ClrYellow); // yellow text
-        GrStringDraw(&sContext, str, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false);
+        GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw line 1
+        GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 10, /*opaque*/ false); //draw line 2 below line 1
         GrFlush(&sContext); // flush the frame buffer to the LCD
     }
 }
