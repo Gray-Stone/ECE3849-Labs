@@ -16,6 +16,8 @@
 #include "Crystalfontz128x128_ST7735.h"
 #include <stdio.h>
 
+#include "buttons.h"
+
 uint32_t gSystemClock; // [Hz] system clock frequency
 volatile uint32_t gTime = 8345; // time in hundredths of a second
 
@@ -37,6 +39,11 @@ int main(void)
     GrContextInit(&sContext, &g_sCrystalfontz128x128); // Initialize the grlib graphics context
     GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 
+    // end of LCD, clock setup
+    ButtonInit();
+    IntMasterEnable();
+    // end of Button Interrupt setup
+
     uint32_t time;  // local copy of gTime
     char str[50];   // string buffer
     // full-screen rectangle
@@ -45,8 +52,10 @@ int main(void)
     while (true) {
         GrContextForegroundSet(&sContext, ClrBlack);
         GrRectFill(&sContext, &rectFullScreen); // fill screen with black
+
         time = gTime; // read shared global only once
-        snprintf(str, sizeof(str), "Time = %06u", time); // convert time to string
+        snprintf(str, sizeof(str), "Time = %02u:%02u:%02u", (time / 6000 ) % 60  , (time / 100) % 60 , time % 100); // convert time to string store in str
+
         GrContextForegroundSet(&sContext, ClrYellow); // yellow text
         GrStringDraw(&sContext, str, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false);
         GrFlush(&sContext); // flush the frame buffer to the LCD
