@@ -57,6 +57,7 @@ volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 
 volatile uint16_t sampleTemp;
+volatile uint16_t sampleTemp2;
 
 void ADC_ISR(void)
 {
@@ -71,6 +72,10 @@ void ADC_ISR(void)
         gADCErrors++;                   // count errors
         ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
     }
+
+    sampleTemp = ADC1_SSFIFO0_R;
+    sampleTemp2 = ADC1_SSFIFO0_R;
+
 //    gADCBuffer[
 //               gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
 //               ] = <...>;               // read sample from the ADC1 sequence 0 FIFO
