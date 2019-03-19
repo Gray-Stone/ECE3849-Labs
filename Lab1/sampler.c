@@ -33,12 +33,12 @@ void ADCInit()
     ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor);
     ADCSequenceDisable(ADC1_BASE, 0);      // choose ADC1 sequence 0; disable before configuring
     ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);    // specify the "Always" trigger
-    ADCSequenceStepConfigure(ADC1_BASE, 0, 0,  );// in the 0th step, sample channel 3 (AIN3)
+    ADCSequenceStepConfigure(ADC1_BASE, 0, 0,  ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);// in the 0th step, sample channel 3 (AIN3)
                                   // enable interrupt, and make it the end of sequence
-    ADCSequenceEnable(...);       // enable the sequence.  it is now sampling
-    ADCIntEnable(...);            // enable sequence 0 interrupt in the ADC1 peripheral
-    IntPrioritySet(...);          // set ADC1 sequence 0 interrupt priority
-    IntEnable(...);               // enable ADC1 sequence 0 interrupt in int. controller
+    ADCSequenceEnable(ADC1_BASE, 0);       // enable the sequence.  it is now sampling
+    ADCIntEnable(ADC1_BASE, 0);            // enable sequence 0 interrupt in the ADC1 peripheral
+    IntPrioritySet(INT_ADC1SS0, ADC1_INT_PRIORITY);          // set ADC1 sequence 0 interrupt priority
+    IntEnable(INT_ADC1SS0);               // enable ADC1 sequence 0 interrupt in int. controller
     //end lab 1 step 2
 
 }

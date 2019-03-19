@@ -8,6 +8,7 @@
 #ifndef SAMPLER_H_
 #define SAMPLER_H_
 
+#define ADC1_INT_PRIORITY 0  // highest priority
 
 
 #endif /* SAMPLER_H_ */
