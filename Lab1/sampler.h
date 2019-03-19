@@ -10,5 +10,8 @@
 
 #define ADC1_INT_PRIORITY 0  // highest priority
 
+void ADCInit();
+void ADC_ISR(void);
+
 
 #endif /* SAMPLER_H_ */

@@ -45,6 +45,45 @@ void ADCInit()
 
 
 
+// ADC ISR
+
+#define ADC_BUFFER_SIZE 2048                             // size must be a power of 2
+#define ADC_BUFFER_WRAP(i) ((i) & (ADC_BUFFER_SIZE - 1)) // index wrapping macro
+volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
+volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
+volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
+
+void ADC_ISR(void)
+{
+    <...>; // clear ADC1 sequence0 interrupt flag in the ADCISC register
+    if (ADC1_OSTAT_R & ADC_OSTAT_OV0) { // check for ADC FIFO overflow
+        gADCErrors++;                   // count errors
+        ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
+    }
+    gADCBuffer[
+               gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
+               ] = <...>;               // read sample from the ADC1 sequence 0 FIFO
+}
+
+
+
+/*
+// Step 4: ADC sample scaling
+
+int y = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)sample - ADC_OFFSET));
+
+float fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
+
+
+// Step 5: Button command processing
+
+const char * const gVoltageScaleStr[] = {
+    "100 mV", "200 mV", "500 mV", "  1 V"
+};
+
+
+ */
+
 
 
 
