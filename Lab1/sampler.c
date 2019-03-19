@@ -16,6 +16,8 @@
 #include "driverlib/adc.h"
 #include "sysctl_pll.h"
 
+#include "inc/tm4c1294ncpdt.h"
+
 #include "sampler.h"
 
 void ADCInit()
@@ -53,16 +55,24 @@ volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 
+volatile uint16_t sampleTemp;
+
 void ADC_ISR(void)
 {
-    <...>; // clear ADC1 sequence0 interrupt flag in the ADCISC register
+
+    ADC1_ISC_R |=1 ;
+    ADC1_OSTAT_R;
+
+
+//
+//    <...>; // clear ADC1 sequence0 interrupt flag in the ADCISC register
     if (ADC1_OSTAT_R & ADC_OSTAT_OV0) { // check for ADC FIFO overflow
         gADCErrors++;                   // count errors
         ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
     }
-    gADCBuffer[
-               gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
-               ] = <...>;               // read sample from the ADC1 sequence 0 FIFO
+//    gADCBuffer[
+//               gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
+//               ] = <...>;               // read sample from the ADC1 sequence 0 FIFO
 }
 
 
