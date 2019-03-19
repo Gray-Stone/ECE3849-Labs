@@ -8,6 +8,8 @@
 #ifndef SAMPLER_H_
 #define SAMPLER_H_
 
+void ADCInit();
+void ADC_ISR(void);
 
 
 #endif /* SAMPLER_H_ */
