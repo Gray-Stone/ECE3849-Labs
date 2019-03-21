@@ -15,18 +15,13 @@
 
 
 
-void pulsePC7Init()
+void pulsePP2Init()
 {
     // Pin PC7 will be used to pulse output for external debug.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_7);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,1);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,0);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,1);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,0);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,0);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,0);
-    GPIOPinWrite(GPIO_PORTC_BASE,GPIO_PIN_7,1);
+//    SysCtlPeripheralEnable(SYSCTL_PERIPP_GPIOC);
+    GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_2);
+
+//    GPIO_PORTC_DATA
 
 
 //

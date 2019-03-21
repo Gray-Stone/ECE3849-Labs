@@ -9,10 +9,8 @@
 #define HWDEBUG_H_
 
 
-void pulsePC7Init();
+void pulsePP2Init();
 
-#define DEBUG_SET      HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 1
-#define DEBUG_CLEAR     HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 0
 
 
 #endif /* HWDEBUG_H_ */
