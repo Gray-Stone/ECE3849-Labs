@@ -23,6 +23,7 @@ uint32_t gSystemClock; // [Hz] system clock frequency
 volatile uint32_t gTime = 8345; // time in hundredths of a second
 char edgetype; // the variable for seeting the trigger edge type
 
+bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
 int32_t findTrigger(int16_t triggerLevel , char edgetype);
 
 
@@ -53,7 +54,7 @@ int main(void)
     ADCInit();
     IntMasterEnable();
 
-    char edgetype; // the variable for seeting the trigger edge type
+    char edgetype = 0; // the variable for seeting the trigger edge type 0 for rising.
     int16_t   triggerLevel = 200 ;
     int32_t     triggerIndex =0;
     uint16_t screenBuffer[128];
@@ -102,6 +103,7 @@ int32_t findTrigger(int16_t triggerLevel , char edgetype)
 
         if (triggerCheck ( sample, sampleFuture, triggerLevel, edgetype ) ) // found a rising edge at trigger
         {
+            sample +=1 ;
             return  triggerIndex ; 
         }
 
