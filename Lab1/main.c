@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include "buttons.h"
 #include "sampler.h"
+#include "hwDebug.h"
 
 uint32_t gSystemClock; // [Hz] system clock frequency
 volatile uint32_t gTime = 8345; // time in hundredths of a second
@@ -40,7 +41,6 @@ int main(void)
     GrContextInit(&sContext, &g_sCrystalfontz128x128); // Initialize the grlib graphics context
     GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 
-    uint32_t time, mins, secs, discsecs, centiseconds;  // local copy of gTime
     char str1[50];   // string buffer line 1
     char str2[50];  //string buffer line 2
     // full-screen rectangle
@@ -49,6 +49,7 @@ int main(void)
     ButtonInit();
     ADCInit();
     IntMasterEnable();
+
 
     volatile int32_t triggerIndex,  triggerIndexPreserved;
     int32_t samplesVisited, sample, sampleFuture;
@@ -75,5 +76,9 @@ int main(void)
         }
         //
         //
+
+
+        pulsePC7Init();
+
     }
 }
