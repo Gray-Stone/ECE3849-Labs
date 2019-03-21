@@ -78,8 +78,8 @@ int main(void)
             }
         }
         //copy samples from 1/2 screen behind to 1/2 ahead the trigger index into local buffer
-        for (i = 0; i < 128; i++){
-            screenBuffer[i] = gADCBuffer[]
+        for (i = -64; i <= 64; i++){
+            screenBuffer[i+64] = gADCBuffer[triggerIndex + i];
         }
 
 
