@@ -53,6 +53,8 @@ int main(void)
 
     volatile int32_t triggerIndex,  triggerIndexPreserved;
     int32_t samplesVisited, sample, sampleFuture;
+    uint16_t screenBuffer[128];
+    int32_t i; //for general looping needs
 
 
     while (true) {
@@ -62,20 +64,24 @@ int main(void)
         triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);//half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
         triggerIndexPreserved = triggerIndex;//preserve the trigger index
         //read the initial sample at this index location
-        samplesVisited = 1; //keep track of samples visited, to abort early if needed
-        sampleFuture = gADCBuffer[triggerIndex];
-        sample = gADCBuffer[triggerIndex];
+        samplesVisited = 2; //keep track of samples visited, to abort early if needed
+        sampleFuture = gADCBuffer[triggerIndex]; //farthest sample forward in time
+        sample = gADCBuffer[ADC_BUFFERWRAP(triggerIndex--)]; //one step behind the future sample
         while (sample >= ADC_OFFSET || sampleFuture >= ADC_OFFSET){ //stop when sample < offset && future > offset
-            triggerIndex = ADC_BUFFER_WRAP(triggerIndex--);
-            sampleFuture = sample;
-            sample =  gADCBuffer[triggerIndex];
+            triggerIndex = ADC_BUFFER_WRAP(triggerIndex--); //move back the index one step
+            sampleFuture = sample; //update the future sample
+            sample =  gADCBuffer[triggerIndex]; //get new sample
             samplesVisited++;
-            if (samplesVisited >= ADC_BUFFER_SIZE / 2)
+            if (samplesVisited >= ADC_BUFFER_SIZE / 2){
                 triggerIndex = triggerIndexPreserved; //reset the index
                 break; //abort search
+            }
         }
-        //
-        //
+        //copy samples from 1/2 screen behind to 1/2 ahead the trigger index into local buffer
+        for (i = 0; i < 128; i++){
+            screenBuffer[i] = gADCBuffer[]
+        }
+
 
 
         pulsePC7Init();
