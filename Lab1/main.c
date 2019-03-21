@@ -70,7 +70,7 @@ int main(void)
             sample =  gADCBuffer[triggerIndex];
             samplesVisited++;
             if (samplesVisited >= ADC_BUFFER_SIZE / 2)
-                triggerIndex = triggerIndexPreserved;
+                triggerIndex = triggerIndexPreserved; //reset the index
                 break; //abort search
         }
         //
