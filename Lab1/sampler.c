@@ -62,23 +62,20 @@ volatile uint16_t sampleTemp2;
 void ADC_ISR(void)
 {
 
-    ADC1_ISC_R |=1 ;
-    ADC1_OSTAT_R;
+    ADC1_ISC_R |=1 ; // clear ADC1 sequence0 interrupt flag in the ADCISC register
+    //ADC1_OSTAT_R; //this does nothing yet
 
-
-//
-//    <...>; // clear ADC1 sequence0 interrupt flag in the ADCISC register
     if (ADC1_OSTAT_R & ADC_OSTAT_OV0) { // check for ADC FIFO overflow
         gADCErrors++;                   // count errors
         ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
     }
 
-    sampleTemp = ADC1_SSFIFO0_R;
-    sampleTemp2 = ADC1_SSFIFO0_R;
+    //sampleTemp = ADC1_SSFIFO0_R;
+    //sampleTemp2 = ADC1_SSFIFO0_R;
 
-//    gADCBuffer[
-//               gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
-//               ] = <...>;               // read sample from the ADC1 sequence 0 FIFO
+    gADCBuffer[
+               gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
+               ] = ADC1_SSFIFO0_R;               // read sample from the ADC1 sequence 0 FIFO
 }
 
 
