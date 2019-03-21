@@ -21,6 +21,9 @@
 
 uint32_t gSystemClock; // [Hz] system clock frequency
 volatile uint32_t gTime = 8345; // time in hundredths of a second
+char edgetype; // the variable for seeting the trigger edge type
+
+int32_t findTrigger(int16_t triggerLevel , char edgetype);
 
 
 int main(void)
@@ -50,33 +53,19 @@ int main(void)
     ADCInit();
     IntMasterEnable();
 
-
-    volatile int32_t triggerIndex,  triggerIndexPreserved;
-    int32_t samplesVisited, sample, sampleFuture;
+    char edgetype; // the variable for seeting the trigger edge type
+    int16_t   triggerLevel = 200 ;
+    int32_t     triggerIndex =0;
     uint16_t screenBuffer[128];
     int32_t i; //for general looping needs
 
 
     while (true) {
 
-        //trigger search:
-        //initialize the trigger index, and preserve it:
-        triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);//half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
-        triggerIndexPreserved = triggerIndex;//preserve the trigger index
-        //read the initial sample at this index location
-        samplesVisited = 2; //keep track of samples visited, to abort early if needed
-        sampleFuture = gADCBuffer[triggerIndex]; //farthest sample forward in time
-        sample = gADCBuffer[ADC_BUFFERWRAP(triggerIndex--)]; //one step behind the future sample
-        while (sample >= ADC_OFFSET || sampleFuture >= ADC_OFFSET){ //stop when sample < offset && future > offset
-            triggerIndex = ADC_BUFFER_WRAP(triggerIndex--); //move back the index one step
-            sampleFuture = sample; //update the future sample
-            sample =  gADCBuffer[triggerIndex]; //get new sample
-            samplesVisited++;
-            if (samplesVisited >= ADC_BUFFER_SIZE / 2){
-                triggerIndex = triggerIndexPreserved; //reset the index
-                break; //abort search
-            }
-        }
+        triggerIndex = findTrigger(triggerLevel,edgetype);
+        //
+        //
+
         //copy samples from 1/2 screen behind to 1/2 ahead the trigger index into local buffer
         for (i = -64; i <= 64; i++){
             screenBuffer[i+64] = gADCBuffer[triggerIndex + i];
@@ -84,8 +73,57 @@ int main(void)
 
 
 
-
-        pulsePC7Init();
+        pulsePP2Init();
 
     }
+}
+
+
+
+
+
+int32_t findTrigger(int16_t triggerLevel , char edgetype)
+{
+    int32_t triggerIndex,  triggerIndexOut ;
+    int16_t  sample, sampleFuture;
+    //trigger search:
+    //initialize the trigger index, and preserve it:
+    triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);//half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
+    triggerIndexOut = triggerIndex;//log the initial trigger index, if nothing found the initial index is going to be used
+    sample = gADCBuffer[triggerIndex]; //read the initial sample at this index location
+
+    // rising edge trigger.
+
+    for ( ; triggerIndex > ADC_BUFFER_WRAP( triggerIndex - ADC_BUFFER_SIZE / 2) ;)   { //stop when sample < offset && future > offset
+        triggerIndex = ADC_BUFFER_WRAP(triggerIndex--);
+        sampleFuture = sample;
+        sample =  gADCBuffer[triggerIndex];
+
+
+        if (triggerCheck ( sample, sampleFuture, triggerLevel, edgetype ) ) // found a rising edge at trigger
+        {
+            return  triggerIndex ;
+        }
+
+    }
+    return triggerIndexOut;
+}
+
+
+
+bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype) // edgetype 0 for rising, 1 for falling.
+{
+    switch (edgetype)
+    {
+        case 0:     // case of rising edge
+            if ( sample < triggerLevel && sampleFuture >= triggerLevel )
+                return true ;
+            break;
+        case 1:     // falling edge
+            if ( sample > triggerLevel && sampleFuture <= triggerLevel )
+               return true ;
+           break;
+    }
+   return false;
+
 }
