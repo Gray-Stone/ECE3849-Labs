@@ -21,6 +21,14 @@
 #include "sampler.h"
 #include "buttons.h"
 
+
+volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
+volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
+volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
+
+volatile uint16_t sampleTemp;
+volatile uint16_t sampleTemp2;
+
 void ADCInit()
 {
     // Initialize ADC1 and input peripheral for lab 1, step 2:
@@ -50,14 +58,6 @@ void ADCInit()
 
 
 // ADC ISR
-#define ADC_BUFFER_SIZE 2048                             // size must be a power of 2
-#define ADC_BUFFER_WRAP(i) ((i) & (ADC_BUFFER_SIZE - 1)) // index wrapping macro
-volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
-volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
-volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
-
-volatile uint16_t sampleTemp;
-volatile uint16_t sampleTemp2;
 
 void ADC_ISR(void)
 {
