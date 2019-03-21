@@ -55,15 +55,22 @@ int main(void)
 
     char edgetype; // the variable for seeting the trigger edge type
     int16_t   triggerLevel = 200 ;
-    int36_t temp =0;
-    bool triggerFound =0;
+    int32_t     triggerIndex =0;
+    uint16_t screenBuffer[128];
+    int32_t i; //for general looping needs
 
 
     while (true) {
 
-        temp = findTrigger(triggerLevel,edgetype);
+        triggerIndex = findTrigger(triggerLevel,edgetype);
         //
         //
+
+        //copy samples from 1/2 screen behind to 1/2 ahead the trigger index into local buffer
+        for (i = -64; i <= 64; i++){
+            screenBuffer[i+64] = gADCBuffer[triggerIndex + i];
+        }
+
 
 
         pulsePP2Init();
