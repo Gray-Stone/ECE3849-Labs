@@ -50,25 +50,30 @@ int main(void)
     ADCInit();
     IntMasterEnable();
 
-    while (true) {
-//        GrContextForegroundSet(&sContext, ClrBlack);
-//        GrRectFill(&sContext, &rectFullScreen); // fill screen with black
-//        time = gTime; // read shared global only once
-        centiseconds = time % 100; //45
-        secs = ((time - centiseconds)/100); //8300 -> 83
-        discsecs = secs % 60; //23
-        mins =(secs / 60);
+    volatile int32_t triggerIndex,  triggerIndexPreserved;
+    int32_t samplesVisited, sample, sampleFuture;
 
-//        snprintf(str1, sizeof(str1), "Time = %02u:%02u:%02u\0", mins, discsecs, centiseconds); //display the time
-//        snprintf(str2, sizeof(str2), "%1u%1u%1u%1u%1u%1u%1u%1u%1u\0", //display the 9 LSb of the button states
-//                 (GPIO_STATE>>8)&1, (GPIO_STATE>>7)&1,
-//                 (GPIO_STATE>>6)&1, (GPIO_STATE>>5)&1,
-//                 (GPIO_STATE>>4)&1, (GPIO_STATE>>3)&1,
-//                 (GPIO_STATE>>2)&1, (GPIO_STATE>>1)&1,
-//                  GPIO_STATE&1); // convert time to string
-//        GrContextForegroundSet(&sContext, ClrYellow); // yellow text
-//        GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw line 1
-//        GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 10, /*opaque*/ false); //draw line 2 below line 1
-//        GrFlush(&sContext); // flush the frame buffer to the LCD
+
+    while (true) {
+
+        //trigger search:
+        //initialize the trigger index, and preserve it:
+        triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);//half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
+        triggerIndexPreserved = triggerIndex;//preserve the trigger index
+        //read the initial sample at this index location
+        samplesVisited = 1; //keep track of samples visited, to abort early if needed
+        sampleFuture = gADCBuffer[triggerIndex];
+        sample = gADCBuffer[triggerIndex];
+        while (sample >= ADC_OFFSET || sampleFuture >= ADC_OFFSET){ //stop when sample < offset && future > offset
+            triggerIndex = ADC_BUFFER_WRAP(triggerIndex--);
+            sampleFuture = sample;
+            sample =  gADCBuffer[triggerIndex];
+            samplesVisited++;
+            if (samplesVisited >= ADC_BUFFER_SIZE / 2)
+                triggerIndex = triggerIndexPreserved;
+                break; //abort search
+        }
+        //
+        //
     }
 }
