@@ -20,6 +20,7 @@
 
 #include "sampler.h"
 #include "buttons.h"
+#include "hwDebug.h"
 
 
 volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
@@ -63,19 +64,21 @@ void ADC_ISR(void)
 {
 
     ADC1_ISC_R |=1 ; // clear ADC1 sequence0 interrupt flag in the ADCISC register
-    //ADC1_OSTAT_R; //this does nothing yet
-
+#ifdef SampleTIMING
+    debugPin0= 1;
+#endif
     if (ADC1_OSTAT_R & ADC_OSTAT_OV0) { // check for ADC FIFO overflow
         gADCErrors++;                   // count errors
         ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
     }
 
-    //sampleTemp = ADC1_SSFIFO0_R;
-    //sampleTemp = ADC1_SSFIFO0_R;
-
     gADCBuffer[
                gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
                ] = ADC1_SSFIFO0_R;               // read sample from the ADC1 sequence 0 FIFO
+#ifdef SampleTIMING
+    debugPin0= 0;
+#endif
+
 }
 
 
