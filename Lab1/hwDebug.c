@@ -14,24 +14,22 @@
 #include "inc/hw_memmap.h"
 
 
-
-void pulsePP2Init()
+//setup PL0-PL3 as GPIO output for debugging.
+void debugPinsInit()
 {
     // Pin PC7 will be used to pulse output for external debug.
-//    SysCtlPeripheralEnable(SYSCTL_PERIPP_GPIOC);
-    GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_2);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);
+    GPIOPinTypeGPIOOutput(GPIO_PORTL_BASE, 0xF); // PL0 - PL3
 
-//    GPIO_PORTC_DATA
+    // use these lines to write to the pin
+    GPIO_PORTL_DATA_R = 0xff;
+    GPIO_PORTL_DATA_R = 0;
 
+    *( GPIO_PORTL_DATA_BITS_R + GPIO_PIN_0 ) = 1 ;
+    *( GPIO_PORTL_DATA_BITS_R + GPIO_PIN_0 ) = 0 ;
 
-//
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 1;
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 1;
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 1;
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 0;
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 0;
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 0;
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + (GPIO_PIN_7 << 2))) = 1;
+    debugPin0 = 1;
+    debugPin0 = 0;
 
 
 }
