@@ -61,9 +61,9 @@ int main(void)
     IntMasterEnable();
 
 
-    char edgetype = 0; // the variable for seeting the trigger edge type 0 for rising.
+    char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
     uint16_t   triggerLevel = 200 ;
-    int32_t     triggerIndex =0 , startIndex =0;
+    int32_t     triggerIndex =0 , startIndex = 0;
     uint16_t samples2Draw[SCREENSIZE];
     int32_t i; //for general looping needs
 
@@ -82,7 +82,7 @@ int main(void)
         }
 
         // draw this onto the screen
-        drawSamples(samples2Draw, SCREENSIZE , 20 );
+        drawSamples(samples2Draw, SCREENSIZE , 200 );
     }
 }
 

@@ -30,7 +30,7 @@ void screenInit()
 }
 
 
-void drawSamples( uint16_t * samplePointer , uint16_t length, uint16_t vPerDiv)
+void drawSamples( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv)
 {
 	GrContextForegroundSet(&sContext, ClrBlack);
 	GrRectFill(&sContext, &rectFullScreen); // fill screen with black
@@ -42,7 +42,7 @@ void drawSamples( uint16_t * samplePointer , uint16_t length, uint16_t vPerDiv)
 	GrContextForegroundSet(&sContext, ClrYellow); // yellow text
 
 	//FOR TESTING::
-	float fVoltsPerDiv = vPerDiv;
+	float fVoltsPerDiv = ((float)mVPerDiv)/1000;
 	//
 
 	int x, y;
