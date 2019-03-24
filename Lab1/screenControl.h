@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define PIXELS_PER_DIV 20 //LCD pixels per voltage division
+
 void screenInit();
 void drawSamples( uint16_t * samplePointer , uint16_t length, uint16_t vPerDiv  );
 

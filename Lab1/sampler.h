@@ -15,6 +15,10 @@
 
 #define ADC_OFFSET 2048
 
+#define VIN_RANGE 3.3 //total input range of the ADC, in volts
+
+#define ADC_BITS 12 //number of bits in the ADC
+
 extern volatile int32_t gADCBufferIndex ;  // latest sample index
 extern volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 extern volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
