@@ -21,6 +21,7 @@ unsigned char fifoPut(uint32_t data)
     if ( newRear == fifoFront )
         return 0; // this is full
     btnFIFO[newRear] = data ;
+    fifoRear = newRear;
     return 1;
 
 }
