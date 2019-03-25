@@ -6,7 +6,6 @@
  */
 
 #include "btnFIFO.h"
-#include <stdint.h>
 
 
 
@@ -16,9 +15,9 @@ volatile unsigned char fifoFront =0;
 
 unsigned char fifoPut(uint32_t data)
 {
-    unsigned char newRaer = fifoRear+1 ;
-    if (newRaer >= FIFO_SIZE )
-        newRaer = 0;
+    unsigned char newRear = fifoRear+1 ;
+    if (newRear  >= FIFO_SIZE )
+        newRear = 0;
     if ( newRear == fifoFront )
         return 0; // this is full
     btnFIFO[newRear] = data ;
@@ -32,7 +31,7 @@ uint32_t fifoPoll()
     if (fifoFront == fifoRear )
         return 0;
 
-    static uin32_t tempData;
+    static uint32_t tempData;
     tempData = btnFIFO[ fifoFront ] ;
     if (fifoFront >= FIFO_SIZE-1 )
         fifoFront =0;

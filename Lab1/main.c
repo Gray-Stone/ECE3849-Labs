@@ -24,6 +24,7 @@
 #include "sampler.h"
 #include "hwDebug.h"
 #include "screenControl.h"
+#include "btnFIFO.h"
 
 #define SCREENSIZE 128
 
@@ -84,6 +85,17 @@ int main(void)
 
         // draw this onto the screen
         drawScreen(samples2Draw, SCREENSIZE , 200 );
+
+        uint32_t btnData = fifoPoll();
+        if ( btnData )
+        {
+            debugPin0 = debugPin1 = 1;
+        }
+        else
+        {
+            debugPin0 = debugPin1 = 0;
+        }
+
     }
 }
 

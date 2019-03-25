@@ -18,7 +18,7 @@
 #include "sysctl_pll.h"
 #include "buttons.h"
 #include "hwDebug.h"
-
+#include "btnFIFO.h"
 
 
 // public globals
@@ -26,9 +26,6 @@ volatile uint32_t gButtons = 0; // debounced button state, one per bit in the lo
 volatile uint32_t GPIO_STATE = 0;
 
 #define FIFO_SIZE 10
-volatile uint32_t btnFIFO[10] = {0};
-volatile unsigned char fifoHead =0;
-volatile unsigned char fifoTail =0;
 
                                 // button is pressed if its bit is 1, not pressed if 0
 uint32_t gJoystick[2] = {0};    // joystick coordinates
@@ -188,7 +185,7 @@ void ButtonISR(void) {
     GPIO_STATE = presses; //update the button states to display on the screen
     if (GPIO_STATE>0 ) // push it into the stack
     {
-        ;
+        fifoPut(GPIO_STATE);
     }
 
 }

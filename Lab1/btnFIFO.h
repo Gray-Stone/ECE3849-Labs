@@ -11,10 +11,10 @@
 
 #define FIFO_SIZE 10
 
+#include <stdint.h>
 
-extern volatile unsigned char fifoHead =0;
-extern volatile unsigned char fifoTail =0;
-
+unsigned char fifoPut(uint32_t data);
+uint32_t fifoPoll();
 
 
 #endif /* BTNFIFO_H_ */

@@ -19,7 +19,7 @@ void debugPinsInit()
 {
     // Pin PC7 will be used to pulse output for external debug.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);
-    GPIOPinTypeGPIOOutput(GPIO_PORTL_BASE, 0xF); // PL0 - PL3
+    GPIOPinTypeGPIOOutput(GPIO_PORTL_BASE, GPIO_PIN_0 | GPIO_PIN_1 |GPIO_PIN_2 | GPIO_PIN_3 ); // PL0 - PL3
 
     // use these lines to write to the pin
     GPIO_PORTL_DATA_R = 0xff;

@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 
-extern uint32_t GPIO_STATE; //holds bitmap of button states for printing to the screen
 
 #define BUTTON_COUNT 5				// number of buttons excluding joystick directions
 #define BUTTON_AND_JOYSTICK_COUNT 9 // number of buttons including joystick directions
