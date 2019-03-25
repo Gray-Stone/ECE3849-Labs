@@ -62,7 +62,7 @@ int main(void)
 
 
     char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
-    uint16_t   triggerLevel = 200 ;
+    uint16_t   triggerLevel = ADC_OFFSET;
     int32_t     triggerIndex =0 , startIndex = 0;
     uint16_t samples2Draw[SCREENSIZE];
     int32_t i; //for general looping needs
@@ -75,7 +75,7 @@ int main(void)
         triggerIndex = findTrigger(triggerLevel,edgetype);
 
         //copy samples from 1/2 screen behind to 1/2 ahead the trigger index into local buffer
-        startIndex = ADC_BUFFER_WRAP( triggerIndex - SCREENSIZE/2 );
+        startIndex = ADC_BUFFER_WRAP( triggerIndex - (SCREENSIZE/2) );
         for (i = 0; i < SCREENSIZE ; i++)  // careful about 0 index.
         {
             samples2Draw[i] = gADCBuffer[ADC_BUFFER_WRAP ( startIndex + i) ];
@@ -104,8 +104,10 @@ int32_t findTrigger(int16_t triggerLevel , char edgetype)
     sample = gADCBuffer[triggerIndex]; //read the initial sample at this index location
 
     // rising edge trigger.
-    for ( ; triggerIndex == ADC_BUFFER_WRAP( triggerIndexInit - ADC_BUFFER_SIZE / 2) ;)   { //stop when sample < offset && future > offset
-        triggerIndex = ADC_BUFFER_WRAP(triggerIndex--);
+    //for ( ; triggerIndex == ADC_BUFFER_WRAP( triggerIndexInit - (ADC_BUFFER_SIZE / 2)) ;)   { //stop when sample < offset && future > offset
+    while (triggerIndex != ADC_BUFFER_WRAP( triggerIndexInit - (ADC_BUFFER_SIZE / 2))) {
+        //triggerIndex = triggerIndex--;
+        triggerIndex = ADC_BUFFER_WRAP(triggerIndex - 1);
         sampleFuture = sample;
         sample =  gADCBuffer[triggerIndex];
 
@@ -135,8 +137,12 @@ bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, c
     switch (edgetype)
     {
         case 0:     // case of rising edge
-            if ( sample < triggerLevel && sampleFuture >= triggerLevel )
+            if ( sample < triggerLevel && sampleFuture >= triggerLevel ){
+                int i;
+                i = sample;
+                i++;
                 return true ;
+            }
             break;
         case 1:     // falling edge
             if ( sample > triggerLevel && sampleFuture <= triggerLevel )

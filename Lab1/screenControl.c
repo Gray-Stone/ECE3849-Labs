@@ -45,11 +45,17 @@ void drawSamples( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv)
 	float fVoltsPerDiv = ((float)mVPerDiv)/1000;
 	//
 
-	int x, y;
+	int x, y, pastY;
 	float fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
 	for (x = 0; x < 128; x++){
 	    y = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)samplePointer[x] - ADC_OFFSET));
-	    GrPixelDraw(&sContext, x, y);
+	    if (x == 0){
+	        GrPixelDraw(&sContext, x, y);
+	    }
+	    else {
+	        GrLineDraw(&sContext, x - 1, pastY, x, y);
+	    }
+        pastY = y;
 	}
 //	GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw line 1
 //	GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 10, /*opaque*/ false); //draw line 2 below line 1

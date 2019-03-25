@@ -13,7 +13,7 @@
 #define ADC_BUFFER_SIZE 2048                             // size must be a power of 2
 #define ADC_BUFFER_WRAP(i) ((i) & (ADC_BUFFER_SIZE - 1)) // index wrapping macro
 
-#define ADC_OFFSET 2048
+#define ADC_OFFSET 2043
 
 #define VIN_RANGE 3.3 //total input range of the ADC, in volts
 
