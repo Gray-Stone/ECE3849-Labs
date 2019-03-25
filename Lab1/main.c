@@ -83,7 +83,7 @@ int main(void)
         }
 
         // draw this onto the screen
-        drawSamples(samples2Draw, SCREENSIZE , 200 );
+        drawScreen(samples2Draw, SCREENSIZE , 200 );
     }
 }
 
