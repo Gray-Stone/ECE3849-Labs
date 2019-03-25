@@ -38,6 +38,13 @@ void drawSamples( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv)
 //    char str1[50];   // string buffer line 1
 //    char str2[50];  //string buffer line 2
 
+	GrContextForegroundSet(&sContext, ClrBlue); //blue gridlines
+	int i;
+	//draw vertical lines
+	for (i = 3; i < 128; i+= PIXELS_PER_DIV) {
+	    GrLineDraw(&sContext, i, 0, i, 127); //vertical lines
+	    GrLineDraw(&sContext, 0, i, 127, i);
+	}
 
 	GrContextForegroundSet(&sContext, ClrYellow); // yellow text
 

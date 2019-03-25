@@ -63,7 +63,7 @@ int main(void)
 
     char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
     uint16_t   triggerLevel = ADC_OFFSET;
-    int32_t     triggerIndex =0 , startIndex = 0;
+    int32_t     triggerIndex = 0 , startIndex = 0;
     uint16_t samples2Draw[SCREENSIZE];
     int32_t i; //for general looping needs
 
