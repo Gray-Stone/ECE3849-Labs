@@ -8,9 +8,6 @@
  *
  */
 
-//timing measuring option
-#define TriggerTIMING
-//#define SampleTIMING
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -30,10 +27,14 @@
 
 #define SCREENSIZE 128
 
+//timing measuring option
+#define TriggerTIMING
+#define SampleTIMING
+
 
 //global variables
 uint32_t gSystemClock; // [Hz] system clock frequency
-volatile uint32_t gTime = 8345; // time in hundredths of a second
+
 char edgetype; // the variable for seeting the trigger edge type
 
 

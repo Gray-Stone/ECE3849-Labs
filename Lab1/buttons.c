@@ -17,19 +17,25 @@
 #include "driverlib/adc.h"
 #include "sysctl_pll.h"
 #include "buttons.h"
+#include "hwDebug.h"
 
 
 
 // public globals
 volatile uint32_t gButtons = 0; // debounced button state, one per bit in the lowest bits
-uint32_t GPIO_STATE = 0;
+volatile uint32_t GPIO_STATE = 0;
+
+#define FIFO_SIZE 10
+volatile uint32_t btnFIFO[10] = {0};
+volatile unsigned char fifoHead =0;
+volatile unsigned char fifoTail =0;
+
                                 // button is pressed if its bit is 1, not pressed if 0
 uint32_t gJoystick[2] = {0};    // joystick coordinates
 uint32_t gADCSamplingRate;      // [Hz] actual ADC sampling rate
 
 // imported globals
 extern uint32_t gSystemClock;   // [Hz] system clock frequency
-extern volatile uint32_t gTime; // time in hundredths of a second
 
 // initialize all button and joystick handling hardware
 void ButtonInit(void)
@@ -176,24 +182,13 @@ void ButtonISR(void) {
     ButtonDebounce(gpio_buttons);       // Run the button debouncer. The result is in gButtons.
     ButtonReadJoystick();               // Convert joystick state to button presses. The result is in gButtons.
     uint32_t presses = ~old_buttons & gButtons;   // detect button presses (transitions from not pressed to pressed)
-    presses |= ButtonAutoRepeat();      // autorepeat presses if a button is held long enough
+//    presses |= ButtonAutoRepeat();      // autorepeat presses if a button is held long enough
 
-    static bool tic = false;
-    static bool running = true;
 
-    if (presses & 1) { // EK-TM4C1294XL button 1 pressed
-        running = !running;
+    GPIO_STATE = presses; //update the button states to display on the screen
+    if (GPIO_STATE>0 ) // push it into the stack
+    {
+        ;
     }
-
-    if (presses & 2) {
-        gTime = 0;
-    }
-
-    if (running) {
-        if (tic) gTime++; // increment time every other ISR call
-        tic = !tic;
-    }
-
-    GPIO_STATE = gButtons; //update the button states to display on the screen
 
 }

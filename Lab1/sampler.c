@@ -22,6 +22,9 @@
 #include "buttons.h"
 #include "hwDebug.h"
 
+//#define SampleTIMING
+
+
 
 volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
