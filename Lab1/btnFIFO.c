@@ -1,7 +1,7 @@
 /*
  * btnFIFO.c
  *
- *  Created on: 2019Äê3ÔÂ25ÈÕ
+ *  Created on: 2019-3-25
  *      Author: Leo
  */
 
@@ -32,11 +32,10 @@ uint32_t fifoPoll()
     if (fifoFront == fifoRear )
         return 0;
 
-    static uint32_t tempData;
-    tempData = btnFIFO[ fifoFront ] ;
+ 
     if (fifoFront >= FIFO_SIZE-1 )
         fifoFront =0;
     else
         ++fifoFront ;
-    return tempData;
-}
+    return btnFIFO[ fifoFront ];
+} 

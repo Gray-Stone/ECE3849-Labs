@@ -159,7 +159,7 @@ int32_t findTrigger(int16_t triggerLevel , char edgetype)
 
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype) // edgetype 0 for rising, 1 for falling.
 {
-    if (edgetype)
+    if (edgetype == 0 )
     {
         if ( sample < triggerLevel && sampleFuture >= triggerLevel )
                 return true ;
@@ -173,19 +173,19 @@ bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, c
 }
 
 
-
+// return the voltage scale according to the given direction 
+// direction is 0 for down, anything else for up. 
+// 
 uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv )
 {
     uint16_t newVoltPerDiv = oldVoltPerDiv;
 
-    switch (oldVoltPerDiv) {
-    case 100: newVoltPerDiv = direction ? 200 : 1000;
-    break;
-    case 200: newVoltPerDiv = direction ? 500 : 100;
-    break;
-    case 500: newVoltPerDiv = direction ? 1000 : 200;
-    break;
-    case 1000: newVoltPerDiv = direction ? 100 : 500;
+    switch (oldVoltPerDiv)
+    {
+    case 100: newVoltPerDiv = direction ? 200 : 100; break;
+    case 200: newVoltPerDiv = direction ? 500 : 100; break;
+    case 500: newVoltPerDiv = direction ? 1000 : 200; break;
+    case 1000: newVoltPerDiv = direction ? 1000 : 500;
     }
     return newVoltPerDiv;
 }
