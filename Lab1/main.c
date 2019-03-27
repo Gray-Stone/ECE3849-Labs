@@ -42,7 +42,7 @@ uint32_t gSystemClock; // [Hz] system clock frequency
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
 int32_t findTrigger(int16_t triggerLevel , char edgetype);
 uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv);
-
+uint32_t measure_ISR_CPU(void);
 
 int main(void)
 {
@@ -188,4 +188,14 @@ uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv )
     case 1000: newVoltPerDiv = direction ? 1000 : 500;
     }
     return newVoltPerDiv;
+}
+
+uint32_t measure_ISR_CPU(void)
+{
+    uint32_t i = 0;
+    TimerIntClear(TIMER3_BASE, TIMER_TIMA_TIMEOUT);
+    TimerEnable(TIMER3_BASE, TIMER_A); // start one-shot timer
+    while (!(TimerIntStatus(TIMER3_BASE, false) & TIMER_TIMA_TIMEOUT))
+        i++;
+    return i;
 }
