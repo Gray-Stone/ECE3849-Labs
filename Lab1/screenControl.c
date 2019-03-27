@@ -66,12 +66,19 @@ void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, 
 	char str1[50];   // string buffer line 1
 	char str2[50];  //string buffer line 2
 	char edgeString[10]; //string buffer for edge display string
+	char voltString[10]; //string buffer for voltage scale display string
+
+	if (mVPerDiv == 1000)
+	    strcpy(voltString, "1 V");
+	else
+	    snprintf(voltString, 10, "%u mV\0", mVPerDiv);
 
 	if (edgetype == 0)
 	    strcpy(edgeString, "rise");
 	else
 	    strcpy(edgeString, "fall");
-    snprintf(str1, 50, "%u uS  %u mV  %s\0", 20, mVPerDiv, edgeString); //Settings status bar
+
+    snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
     snprintf(str2, 50, "CPU Load: %.1f", 99.111); //Settings status bar
 	GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
 	GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
