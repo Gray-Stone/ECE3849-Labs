@@ -9,6 +9,7 @@
 #include "sampler.h" //needed for defines
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "Crystalfontz128x128_ST7735.h"
 
@@ -31,7 +32,7 @@ void screenInit()
 }
 
 
-void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv)
+void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, char edgetype)
 {
 	GrContextForegroundSet(&sContext, ClrBlack);
 	GrRectFill(&sContext, &rectFullScreen); // fill screen with black background
@@ -64,7 +65,13 @@ void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv)
 	GrContextForegroundSet(&sContext, ClrWhite); //white text
 	char str1[50];   // string buffer line 1
 	char str2[50];  //string buffer line 2
-    snprintf(str1, 50, " %u uS   %u mV   %c\0", 20, mVPerDiv, '^'); //Settings status bar
+	char edgeString[10]; //string buffer for edge display string
+
+	if (edgetype == 0)
+	    strcpy(edgeString, "rise");
+	else
+	    strcpy(edgeString, "fall");
+    snprintf(str1, 50, "%u uS  %u mV  %s\0", 20, mVPerDiv, edgeString); //Settings status bar
     snprintf(str2, 50, "CPU Load: %.1f", 99.111); //Settings status bar
 	GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
 	GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1

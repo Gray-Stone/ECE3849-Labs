@@ -84,7 +84,7 @@ int main(void)
         }
 
         // draw this onto the screen
-        drawScreen(samples2Draw, SCREENSIZE , 200 );
+        drawScreen(samples2Draw, SCREENSIZE , 200, edgetype);
 
         uint32_t btnData = fifoPoll();
         if ( btnData )
