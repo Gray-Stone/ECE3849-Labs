@@ -14,7 +14,7 @@
 #define PIXELS_PER_DIV 20 //LCD pixels per voltage division
 
 void screenInit();
-void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t vPerDiv , char edgetype);
+void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t vPerDiv , char edgetype, float cpu_load);
 
 
 

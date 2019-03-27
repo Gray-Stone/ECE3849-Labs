@@ -16,6 +16,8 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
 #include "inc/tm4c1294ncpdt.h"
+#include "driverlib/timer.h"
+#include "inc/hw_memmap.h"
 
 
 #include "Crystalfontz128x128_ST7735.h"
@@ -60,6 +62,17 @@ int main(void)
     ButtonInit();
     ADCInit();
     debugPinsInit();
+
+    // initialize timer 3 in one-shot mode for polled timing
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
+    TimerDisable(TIMER3_BASE, TIMER_BOTH);
+    TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT);
+    TimerLoadSet(TIMER3_BASE, TIMER_A, (gSystemClock/100) - 1); // 10 ms interval
+
+    uint32_t count_unloaded = measure_ISR_CPU();
+    uint32_t count_loaded = 0;
+    float cpu_load = 0;
+
     IntMasterEnable();
 
     // trigger edge controlled by Button S1
@@ -74,6 +87,9 @@ int main(void)
 
     while (true) {
 
+        count_loaded = measure_ISR_CPU();
+        cpu_load = 1.0f - (float)count_loaded/count_unloaded; // compute CPU load
+
         //find the trigger point.
         triggerIndex = findTrigger(triggerLevel,edgetype);
 
@@ -85,7 +101,7 @@ int main(void)
         }
 
         // draw this onto the screen
-        drawScreen(samples2Draw, SCREENSIZE , mVPerDiv, edgetype);
+        drawScreen(samples2Draw, SCREENSIZE , mVPerDiv, edgetype, cpu_load);
 
         // make sure this button thing is the last section in code.
         uint32_t btnData = fifoPoll();
@@ -107,6 +123,7 @@ int main(void)
             mVPerDiv = changeVoltPerDiv(0, mVPerDiv);
 
 //        if (btnData & 0x01)
+
 
     }
 }
