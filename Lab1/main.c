@@ -36,7 +36,6 @@
 //global variables
 uint32_t gSystemClock; // [Hz] system clock frequency
 
-char edgetype; // the variable for seeting the trigger edge type
 
 
 //functions
@@ -62,8 +61,9 @@ int main(void)
     debugPinsInit();
     IntMasterEnable();
 
-
+    // trigger edge controlled by Button S1
     char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
+    short mVPerDiv  = 100; // set the voltage scale.
     uint16_t   triggerLevel = ADC_OFFSET;
     int32_t     triggerIndex = 0 , startIndex = 0;
     uint16_t samples2Draw[SCREENSIZE];
@@ -86,15 +86,20 @@ int main(void)
         // draw this onto the screen
         drawScreen(samples2Draw, SCREENSIZE , 200, edgetype);
 
+        // make sure this button thing is the last section in code.
         uint32_t btnData = fifoPoll();
-        if ( btnData )
-        {
-            debugPin0 = debugPin1 = 1;
-        }
-        else
-        {
-            debugPin0 = debugPin1 = 0;
-        }
+        if ( btnData == 0 )
+            continue; // short circuit skip all the rest of the button checks.
+        // Booster Pack btn S1 change trigger.  0x0004
+        // Booster Pack btn S2 change run/stop. 0x0008
+        // Booster Pack joy up increase V/div   0x0080
+        // Booster Pack joy down decrease V/div 0x0100
+        // Booster Pack joy Left more us/div    0x0040
+        // Booster Pack joy Right less us/div   0x0020
+        if (btnData & 0x0004 ) // case of btn S1 is pushed.
+            ;
+
+//        if (btnData & 0x01)
 
     }
 }
