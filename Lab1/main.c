@@ -84,7 +84,7 @@ int main(void)
         }
 
         // draw this onto the screen
-        drawScreen(samples2Draw, SCREENSIZE , mVPerDiv );
+        drawScreen(samples2Draw, SCREENSIZE , mVPerDiv, edgetype);
 
         // make sure this button thing is the last section in code.
         uint32_t btnData = fifoPoll();
