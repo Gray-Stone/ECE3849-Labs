@@ -41,6 +41,7 @@ uint32_t gSystemClock; // [Hz] system clock frequency
 //functions
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
 int32_t findTrigger(int16_t triggerLevel , char edgetype);
+uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv);
 
 
 int main(void)
@@ -101,9 +102,9 @@ int main(void)
         if ( btnData & 0x0008 ) // case of btnS2 is pushed.
             ; // currently we don't care about this.
         if ( btnData & 0x0080 ) // case of increase voltage scale.
-            ;
+            mVPerDiv = changeVoltPerDiv(1, mVPerDiv);
         if ( btnData & 0x0100 ) // case of decrease voltage scale
-            ;
+            mVPerDiv = changeVoltPerDiv(0, mVPerDiv);
 
 //        if (btnData & 0x01)
 
@@ -175,6 +176,16 @@ bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, c
 
 uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv )
 {
-    if ( oldVoltPerDiv) 
-    ;
+    uint16_t newVoltPerDiv = oldVoltPerDiv;
+
+    switch (oldVoltPerDiv) {
+    case 100: newVoltPerDiv = direction ? 200 : 1000;
+    break;
+    case 200: newVoltPerDiv = direction ? 500 : 100;
+    break;
+    case 500: newVoltPerDiv = direction ? 1000 : 200;
+    break;
+    case 1000: newVoltPerDiv = direction ? 100 : 500;
+    }
+    return newVoltPerDiv;
 }
