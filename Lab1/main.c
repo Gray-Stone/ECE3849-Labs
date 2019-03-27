@@ -63,7 +63,7 @@ int main(void)
 
     // trigger edge controlled by Button S1
     char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
-    short mVPerDiv  = 100; // set the voltage scale.
+    uint16_t mVPerDiv  = 100; // set the voltage scale.
     uint16_t   triggerLevel = ADC_OFFSET;
     int32_t     triggerIndex = 0 , startIndex = 0;
     uint16_t samples2Draw[SCREENSIZE];
@@ -84,7 +84,7 @@ int main(void)
         }
 
         // draw this onto the screen
-        drawScreen(samples2Draw, SCREENSIZE , 200 );
+        drawScreen(samples2Draw, SCREENSIZE , mVPerDiv );
 
         // make sure this button thing is the last section in code.
         uint32_t btnData = fifoPoll();
@@ -96,7 +96,13 @@ int main(void)
         // Booster Pack joy down decrease V/div 0x0100
         // Booster Pack joy Left more us/div    0x0040
         // Booster Pack joy Right less us/div   0x0020
-        if (btnData & 0x0004 ) // case of btn S1 is pushed.
+        if ( btnData & 0x0004 ) // case of btn S1 is pushed. flip triggerType
+            edgetype^=0x01 ;
+        if ( btnData & 0x0008 ) // case of btnS2 is pushed.
+            ; // currently we don't care about this.
+        if ( btnData & 0x0080 ) // case of increase voltage scale.
+            ;
+        if ( btnData & 0x0100 ) // case of decrease voltage scale
             ;
 
 //        if (btnData & 0x01)
@@ -152,21 +158,23 @@ int32_t findTrigger(int16_t triggerLevel , char edgetype)
 
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype) // edgetype 0 for rising, 1 for falling.
 {
-    switch (edgetype)
+    if (edgetype)
     {
-        case 0:     // case of rising edge
-            if ( sample < triggerLevel && sampleFuture >= triggerLevel ){
-                int i;
-                i = sample;
-                i++;
+        if ( sample < triggerLevel && sampleFuture >= triggerLevel )
                 return true ;
-            }
-            break;
-        case 1:     // falling edge
-            if ( sample > triggerLevel && sampleFuture <= triggerLevel )
+    }
+    else
+    {
+        if ( sample > triggerLevel && sampleFuture <= triggerLevel )
                return true ;
-           break;
     }
    return false;
 }
 
+
+
+uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv )
+{
+    if ( oldVoltPerDiv) 
+    ;
+}
