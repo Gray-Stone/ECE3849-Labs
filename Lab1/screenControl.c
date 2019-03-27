@@ -69,7 +69,7 @@ void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, 
 	char voltString[10]; //string buffer for voltage scale display string
 
 	if (mVPerDiv == 1000)
-	    strcpy(voltString, "1 V");
+	    strcpy(voltString, "  1  V");
 	else
 	    snprintf(voltString, 10, "%u mV\0", mVPerDiv);
 
