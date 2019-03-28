@@ -15,6 +15,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/adc.h"
 #include "sysctl_pll.h"
+#include "driverlib/timer.h"
 
 #include "inc/tm4c1294ncpdt.h"
 
@@ -22,8 +23,9 @@
 #include "buttons.h"
 #include "hwDebug.h"
 
-//#define SampleTIMING
+#define SampleTIMING
 
+extern uint32_t gSystemClock;   // [Hz] system clock frequency
 
 
 volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
@@ -44,7 +46,23 @@ void ADCInit()
     // ADC clock
     uint32_t pll_frequency = SysCtlFrequencyGet(CRYSTAL_FREQUENCY);
     uint32_t pll_divisor = (pll_frequency - 1) / (16 * ADC_SAMPLING_RATE) + 1; //round up
-    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor);
+
+    //////**************************** TESTING CODE
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4);    //timer 3 used for cpu stuff, let's use timer 4
+
+    TimerDisable(TIMER4_BASE, TIMER_BOTH);
+    TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC); //want TIMER_CFG_PERIODIC ?
+    TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/400000) - 1); // 10 ms interval (timeScale/20)
+
+    TimerControlTrigger(TIMER4_BASE, TIMER_A, true); //we use timer A for cpu measurement, so use B for this
+
+    //ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_TIMER, 0);
+
+    //TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    //TimerEnable(TIMER4_BASE, TIMER_BOTH);
+    //////*****************************
+
+
     ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor);
     ADCSequenceDisable(ADC1_BASE, 0);      // choose ADC1 sequence 0; disable before configuring
     ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);    // specify the "Always" trigger
@@ -57,6 +75,32 @@ void ADCInit()
     //end lab 1 step 2
 
 }
+
+void alwaysTriggerADC(void) {
+    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
+}
+
+void timerTriggerADC(uint32_t denominator){
+    TimerDisable(TIMER4_BASE, TIMER_BOTH);
+    TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/denominator) - 1);
+    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_TIMER, 0);
+    TimerEnable(TIMER4_BASE, TIMER_BOTH);
+}
+
+/*
+ *
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4);    //timer 3 used for cpu stuff, let's use timer 4
+
+    TimerDisable(TIMER4_BASE, TIMER_A);
+    TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC); //want TIMER_CFG_PERIODIC ?
+    TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/100) - 1); // 10 ms interval
+    TimerControlTrigger(TIMER4_BASE, TIMER_A, true); //we use timer A for cpu measurement, so use B for this
+
+    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_TIMER, 0);
+
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    TimerEnable(TIMER0_BASE, TIMER_BOTH);
+ */
 
 
 

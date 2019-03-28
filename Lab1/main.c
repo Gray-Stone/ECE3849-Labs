@@ -45,6 +45,8 @@ bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, c
 int32_t findTrigger(int16_t triggerLevel , char edgetype);
 uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv);
 uint32_t measure_ISR_CPU(void);
+uint32_t changeTimePerDiv(char direction, uint16_t oldTimePerDiv );
+
 
 int main(void)
 {
@@ -67,7 +69,7 @@ int main(void)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
     TimerDisable(TIMER3_BASE, TIMER_BOTH);
     TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT);
-    TimerLoadSet(TIMER3_BASE, TIMER_A, (gSystemClock/100) - 1); // 10 ms interval
+    TimerLoadSet(TIMER3_BASE, TIMER_A, (gSystemClock/100) - 1); //
 
     uint32_t count_unloaded = measure_ISR_CPU();
     uint32_t count_loaded = 0;
@@ -78,6 +80,7 @@ int main(void)
     // trigger edge controlled by Button S1
     char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
     uint16_t mVPerDiv  = 100; // set the voltage scale.
+    uint32_t usPerDiv = 20; // set the time scale.
     uint16_t   triggerLevel = ADC_OFFSET;
     int32_t     triggerIndex = 0 , startIndex = 0;
     uint16_t samples2Draw[SCREENSIZE];
@@ -121,6 +124,10 @@ int main(void)
             mVPerDiv = changeVoltPerDiv(1, mVPerDiv);
         if ( btnData & 0x0100 ) // case of decrease voltage scale
             mVPerDiv = changeVoltPerDiv(0, mVPerDiv);
+        if (btnData & 0x0040)
+            usPerDiv= changeTimePerDiv(1,usPerDiv);
+        if (btnData & 0x0020)
+            usPerDiv= changeTimePerDiv(0,usPerDiv);
 
 //        if (btnData & 0x01)
 
@@ -207,6 +214,46 @@ uint16_t changeVoltPerDiv(char direction, uint16_t oldVoltPerDiv )
     return newVoltPerDiv;
 }
 
+//returns the new time per division (in uS), according to the direction given
+//direction is 0 for zoom in, anything else for zoom out
+uint32_t changeTimePerDiv(char direction, uint16_t oldTimePerDiv )
+{
+    uint16_t newTimePerDiv = oldTimePerDiv;
+
+    switch (oldTimePerDiv)
+    {
+    case 20:
+        if (direction) {
+            newTimePerDiv = 50;
+            timerTriggerADC(400000);
+        }
+        break;
+    case 50:
+        if (direction) {
+            newTimePerDiv = 100;
+            timerTriggerADC(10000);
+        }
+        else {
+            newTimePerDiv = 20;
+            alwaysTriggerADC();
+        }
+        break;
+    case 100:
+        if (!direction) {
+            newTimePerDiv = 50;
+            timerTriggerADC(400000);
+        }
+        break;
+    }
+    return newTimePerDiv;
+}
+/*
+ * void alwaysTriggerADC(void) {
+    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
+}
+
+void timerTriggerADC(uint32_t denominator){
+ */
 uint32_t measure_ISR_CPU(void)
 {
     uint32_t i = 0;
