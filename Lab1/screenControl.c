@@ -79,7 +79,7 @@ void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, 
 	    strcpy(edgeString, "fall");
 
     snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
-    snprintf(str2, 50, "CPU Load: %.5f", cpu_load*100); //Settings status bar
+    snprintf(str2, 50, "CPU Load: %.5f%", cpu_load*100); //Settings status bar
 	GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
 	GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
 
