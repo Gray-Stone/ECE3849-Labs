@@ -30,15 +30,11 @@
 
 #define SCREENSIZE 128
 
-//timing measuring option
+//timing debug measuring option
 #define TriggerTIMING
-#define SampleTIMING
-
 
 //global variables
 uint32_t gSystemClock; // [Hz] system clock frequency
-
-
 
 //functions
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
@@ -59,8 +55,8 @@ int main(void)
     // Initialize the system clock to 120 MHz
     gSystemClock = SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 120000000);
 
+    // initialize all sub components.
     screenInit();
-
     ButtonInit();
     ADCInit();
     debugPinsInit();
@@ -77,7 +73,6 @@ int main(void)
 
     IntMasterEnable();
 
-    // trigger edge controlled by Button S1
     char edgetype = 0; // the variable for setting the trigger edge type: 0 for rising.
     uint16_t mVPerDiv  = 100; // set the voltage scale.
     uint32_t usPerDiv = 20; // set the time scale.
@@ -87,9 +82,9 @@ int main(void)
     int32_t i; //for general looping needs
 
 
-
     while (true) {
 
+        // measure CPU load.
         count_loaded = measure_ISR_CPU();
         cpu_load = 1.0f - (float)count_loaded/count_unloaded; // compute CPU load
 
@@ -124,58 +119,48 @@ int main(void)
             mVPerDiv = changeVoltPerDiv(1, mVPerDiv);
         if ( btnData & 0x0100 ) // case of decrease voltage scale
             mVPerDiv = changeVoltPerDiv(0, mVPerDiv);
-        if (btnData & 0x0040)
+        if (btnData & 0x0040)   // case of increase time scale
             usPerDiv= changeTimePerDiv(1,usPerDiv);
-        if (btnData & 0x0020)
+        if (btnData & 0x0020)   // case of decrease time scale
             usPerDiv= changeTimePerDiv(0,usPerDiv);
-
-//        if (btnData & 0x01)
-
-
     }
 }
 
 
 
 
-
+// go though the gathered waveform trying to find a trigger case.
 int32_t findTrigger(int16_t triggerLevel , char edgetype)
 {
 #ifdef TriggerTIMING
     debugPin1= 1;
 #endif
-    int32_t triggerIndex,  triggerIndexInit ;
-    uint16_t  sample, sampleFuture;
-    //trigger search:
+    int32_t triggerIndex,  triggerIndexInit ;   // sotre the trigger locations.
+    uint16_t  sample, sampleFuture; // the two samples to compare to
+
     //initialize the trigger index, and preserve it:
     triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);//half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
     triggerIndexInit = triggerIndex;//log the initial trigger index, if nothing found the initial index is going to be used
     sample = gADCBuffer[triggerIndex]; //read the initial sample at this index location
 
-    // rising edge trigger.
-    //for ( ; triggerIndex == ADC_BUFFER_WRAP( triggerIndexInit - (ADC_BUFFER_SIZE / 2)) ;)   { //stop when sample < offset && future > offset
-    while (triggerIndex != ADC_BUFFER_WRAP( triggerIndexInit - (ADC_BUFFER_SIZE / 2))) {
-        //triggerIndex = triggerIndex--;
+    while (triggerIndex != ADC_BUFFER_WRAP( triggerIndexInit - (ADC_BUFFER_SIZE / 2))) // keep looping until trigger is about to hit the newly read data.
+    {
         triggerIndex = ADC_BUFFER_WRAP(triggerIndex - 1);
         sampleFuture = sample;
         sample =  gADCBuffer[triggerIndex];
-
-
         if (triggerCheck ( sample, sampleFuture, triggerLevel, edgetype ) ) // found a rising edge at trigger
         {
-            sample +=1 ;
 #ifdef TriggerTIMING
     debugPin1= 0;
 #endif
             return  triggerIndex ;
         }
-
     }
-
+    // case of nothing found
 #ifdef TriggerTIMING
     debugPin1= 0;
 #endif
-
+    // just plot whatever is newest.
     return triggerIndexInit;
 }
 
@@ -185,12 +170,12 @@ bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, c
 {
     if (edgetype == 0 )
     {
-        if ( sample < triggerLevel && sampleFuture >= triggerLevel )
+        if ( sample < triggerLevel && sampleFuture >= triggerLevel ) // rising edge case
                 return true ;
     }
     else
     {
-        if ( sample > triggerLevel && sampleFuture <= triggerLevel )
+        if ( sample > triggerLevel && sampleFuture <= triggerLevel )    // falling edge case.
                return true ;
     }
    return false;
@@ -247,13 +232,7 @@ uint32_t changeTimePerDiv(char direction, uint16_t oldTimePerDiv )
     }
     return newTimePerDiv;
 }
-/*
- * void alwaysTriggerADC(void) {
-    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
-}
 
-void timerTriggerADC(uint32_t denominator){
- */
 uint32_t measure_ISR_CPU(void)
 {
     uint32_t i = 0;

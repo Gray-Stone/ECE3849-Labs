@@ -13,20 +13,21 @@ volatile uint32_t btnFIFO[FIFO_SIZE] = {0};
 volatile unsigned char fifoRear =0;
 volatile unsigned char fifoFront =0;
 
+// push the data into the FIFO, return 1 for sucess, return 0 for fifo full.
 unsigned char fifoPut(uint32_t data)
 {
     unsigned char newRear = fifoRear+1 ;
-    if (newRear  >= FIFO_SIZE )
+    if (newRear  >= FIFO_SIZE ) // warp around case
         newRear = 0;
-    if ( newRear == fifoFront )
-        return 0; // this is full
-    btnFIFO[newRear] = data ;
-    fifoRear = newRear;
+    if ( newRear == fifoFront ) // this is full
+        return 0;
+    btnFIFO[newRear] = data ; // push the data in
+    fifoRear = newRear; // update the pointer
     return 1;
 
 }
 
-
+// get the last item from fifo and remove the item from list, return the value, 0 for no last item.
 uint32_t fifoPoll()
 {
     if (fifoFront == fifoRear )

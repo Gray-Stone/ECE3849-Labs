@@ -165,7 +165,6 @@ uint32_t ButtonAutoRepeat(void)
 // ISR for scanning and debouncing buttons
 void ButtonISR(void) {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT); // clear interrupt flag
-
     // read hardware button state
     uint32_t gpio_buttons =
             ~GPIOPinRead(GPIO_PORTJ_BASE, 0xff) & (GPIO_PIN_1 | GPIO_PIN_0); // EK-TM4C1294XL buttons in positions 0 and 1
@@ -179,8 +178,6 @@ void ButtonISR(void) {
     ButtonDebounce(gpio_buttons);       // Run the button debouncer. The result is in gButtons.
     ButtonReadJoystick();               // Convert joystick state to button presses. The result is in gButtons.
     uint32_t presses = ~old_buttons & gButtons;   // detect button presses (transitions from not pressed to pressed)
-//    presses |= ButtonAutoRepeat();      // autorepeat presses if a button is held long enough
-
 
     GPIO_STATE = presses; //update the button states to display on the screen
     if (GPIO_STATE>0 ) // push it into the stack

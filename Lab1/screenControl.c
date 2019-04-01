@@ -10,25 +10,19 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "Crystalfontz128x128_ST7735.h"
-
-
 
 tContext sContext;
 tRectangle rectFullScreen;
 
-
 void screenInit()
 {
-
 	Crystalfontz128x128_Init(); // Initialize the LCD display driver
     Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP); // set screen orientation
     GrContextInit(&sContext, &g_sCrystalfontz128x128); // Initialize the grlib graphics context
     tRectangle rectFullScreenLocal = {0, 0, GrContextDpyWidthGet(&sContext)-1, GrContextDpyHeightGet(&sContext)-1};
     rectFullScreen = rectFullScreenLocal;
     GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
-
 }
 
 
@@ -61,7 +55,6 @@ void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, 
 	    }
         pastY = y;
 	}
-
 	GrContextForegroundSet(&sContext, ClrWhite); //white text
 	char str1[50];   // string buffer line 1
 	char str2[50];  //string buffer line 2
@@ -72,7 +65,6 @@ void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, 
 	    strcpy(voltString, "  1  V");
 	else
 	    snprintf(voltString, 10, "%u mV\0", mVPerDiv);
-
 	if (edgetype == 0)
 	    strcpy(edgeString, "rise");
 	else

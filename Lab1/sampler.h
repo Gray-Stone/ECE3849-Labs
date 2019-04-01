@@ -8,6 +8,9 @@
 #ifndef SAMPLER_H_
 #define SAMPLER_H_
 
+//timing debug measuring option
+#define SampleTIMING
+
 #define ADC1_INT_PRIORITY 0  // highest priority
 
 #define ADC_BUFFER_SIZE 2048                             // size must be a power of 2

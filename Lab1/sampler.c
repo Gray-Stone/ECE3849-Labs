@@ -23,17 +23,12 @@
 #include "buttons.h"
 #include "hwDebug.h"
 
-#define SampleTIMING
-
 extern uint32_t gSystemClock;   // [Hz] system clock frequency
-
 
 volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 
-volatile uint16_t sampleTemp;
-volatile uint16_t sampleTemp2;
 
 void ADCInit()
 {
@@ -56,13 +51,7 @@ void ADCInit()
 
     TimerControlTrigger(TIMER4_BASE, TIMER_A, true); //we use timer A for cpu measurement, so use B for this
 
-    //ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_TIMER, 0);
-
-    //TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    //TimerEnable(TIMER4_BASE, TIMER_BOTH);
-    //////*****************************
-
-
+    //////****************************
     ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor);
     ADCSequenceDisable(ADC1_BASE, 0);      // choose ADC1 sequence 0; disable before configuring
     ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);    // specify the "Always" trigger
@@ -73,13 +62,14 @@ void ADCInit()
     IntPrioritySet(INT_ADC1SS0, ADC1_INT_PRIORITY);          // set ADC1 sequence 0 interrupt priority
     IntEnable(INT_ADC1SS0);               // enable ADC1 sequence 0 interrupt in int. controller
     //end lab 1 step 2
-
 }
 
+// for 20us mode.
 void alwaysTriggerADC(void) {
     ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
 }
 
+// for all other samping mode.
 void timerTriggerADC(uint32_t denominator){
     TimerDisable(TIMER4_BASE, TIMER_BOTH);
     TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/denominator) - 1);
@@ -87,29 +77,10 @@ void timerTriggerADC(uint32_t denominator){
     TimerEnable(TIMER4_BASE, TIMER_BOTH);
 }
 
-/*
- *
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4);    //timer 3 used for cpu stuff, let's use timer 4
-
-    TimerDisable(TIMER4_BASE, TIMER_A);
-    TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC); //want TIMER_CFG_PERIODIC ?
-    TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/100) - 1); // 10 ms interval
-    TimerControlTrigger(TIMER4_BASE, TIMER_A, true); //we use timer A for cpu measurement, so use B for this
-
-    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_TIMER, 0);
-
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    TimerEnable(TIMER0_BASE, TIMER_BOTH);
- */
-
-
-
-
 // ADC ISR
 
 void ADC_ISR(void)
 {
-
     ADC1_ISC_R |=1 ; // clear ADC1 sequence0 interrupt flag in the ADCISC register
 #ifdef SampleTIMING
     debugPin0= 1;
@@ -118,7 +89,6 @@ void ADC_ISR(void)
         gADCErrors++;                   // count errors
         ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
     }
-
     gADCBuffer[
                gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
                ] = ADC1_SSFIFO0_R;               // read sample from the ADC1 sequence 0 FIFO
@@ -127,26 +97,3 @@ void ADC_ISR(void)
 #endif
 
 }
-
-
-
-/*
-// Step 4: ADC sample scaling
-
-int y = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)sample - ADC_OFFSET));
-
-float fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
-
-
-// Step 5: Button command processing
-
-const char * const gVoltageScaleStr[] = {
-    "100 mV", "200 mV", "500 mV", "  1 V"
-};
-
-
- */
-
-
-
-
