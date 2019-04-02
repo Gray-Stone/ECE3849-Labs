@@ -49,7 +49,7 @@ void ADCInit()
     TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC); //want TIMER_CFG_PERIODIC ?
     TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/400000) - 1); // 10 ms interval (timeScale/20)
 
-    TimerControlTrigger(TIMER4_BASE, TIMER_A, true); //we use timer A for cpu measurement, so use B for this
+    TimerControlTrigger(TIMER4_BASE, TIMER_A, true);
 
     //////****************************
     ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor);
