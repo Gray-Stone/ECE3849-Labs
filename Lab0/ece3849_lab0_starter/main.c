@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include "buttons.h"
 
+
 uint32_t gSystemClock; // [Hz] system clock frequency
 volatile uint32_t gTime = 8345; // time in hundredths of a second
 
@@ -48,7 +49,12 @@ int main(void)
     ButtonInit();
     IntMasterEnable();
 
+
+
+
     while (true) {
+
+
         GrContextForegroundSet(&sContext, ClrBlack);
         GrRectFill(&sContext, &rectFullScreen); // fill screen with black
         time = gTime; // read shared global only once

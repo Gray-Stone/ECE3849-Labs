@@ -6,8 +6,8 @@
 ## from TI site
 
 **/Debug/
-**/.config
+# **/.config
 **\.xdchelp
-**\.launches
+# **\.launches
 
 **\.vscode
