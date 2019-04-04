@@ -7,7 +7,7 @@
         <srcFile name="package/cfg/rtos_pem4f.c"/>
     </sources>
     <configscripts>
-        <srcFile name="C:/Users/gene/Documents/Work/ECE 3849/workspace_v7/ece3849_lab2_starter/rtos.cfg"/>
+        <srcFile name="C:/Users/Edward/Documents/WPI/Junior/D_Term/ECE_3849/Labs/ECE3849-Labs/ece3849_lab2_starter/rtos.cfg"/>
     </configscripts>
     <makefiles>
         <srcFile name="package.mak" src="package.bld"/>
@@ -20,12 +20,12 @@
     </makefiles>
     <targets>
         <target name="ti.targets.arm.elf.M4F"
-            version="ti.targets.arm.elf.M4F{1,0,16.9,4"
-            rawVersion="16.9.4"
+            version="ti.targets.arm.elf.M4F{1,0,18.1,4"
+            rawVersion="18.1.4"
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="em4f"
-            rootDir="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS"
+            rootDir="C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS"
             os="undefined"
             rts="ti.targets.arm.rtsarm">
             <model endian="little"
@@ -44,7 +44,7 @@
         isPartial="false"
         xCfgScript="package/cfg/rtos_pem4f.cfg"
         xCfgPrefix="package/cfg/rtos_pem4f"
-        cfgScript="C:/Users/gene/Documents/Work/ECE 3849/workspace_v7/ece3849_lab2_starter/rtos.cfg"
+        cfgScript="C:/Users/Edward/Documents/WPI/Junior/D_Term/ECE_3849/Labs/ECE3849-Labs/ece3849_lab2_starter/rtos.cfg"
         cfgArgs="null"
         />
     </configurations>
@@ -56,7 +56,7 @@
         profile="release"
         xCfgScript="package/cfg/rtos_pem4f.cfg"
         xCfgPrefix="package/cfg/rtos_pem4f"
-        cfgScript="C:/Users/gene/Documents/Work/ECE 3849/workspace_v7/ece3849_lab2_starter/rtos.cfg"
+        cfgScript="C:/Users/Edward/Documents/WPI/Junior/D_Term/ECE_3849/Labs/ECE3849-Labs/ece3849_lab2_starter/rtos.cfg"
         cfgArgs="null"
         />
     </executables>
