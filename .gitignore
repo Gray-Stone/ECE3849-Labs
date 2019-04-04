@@ -5,9 +5,9 @@
 
 ## from TI site
 
-# **/Debug/
+**/Debug/
 # **/.config
-# **\.xdchelp
+**\.xdchelp
 # **\.launches
 
 **\.vscode
