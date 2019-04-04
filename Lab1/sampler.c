@@ -79,7 +79,7 @@ void timerTriggerADC(uint32_t denominator){
 
 // ADC ISR
 
-void ADC_ISR(void)
+void ADC_ISR()
 {
     ADC1_ISC_R |=1 ; // clear ADC1 sequence0 interrupt flag in the ADCISC register
 #ifdef SampleTIMING

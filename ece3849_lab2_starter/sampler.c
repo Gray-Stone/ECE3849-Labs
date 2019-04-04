@@ -5,6 +5,8 @@
  *      Author: Leo
  */
 
+
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
@@ -22,6 +24,8 @@
 #include "sampler.h"
 #include "buttons.h"
 #include "hwDebug.h"
+
+
 
 extern uint32_t gSystemClock;   // [Hz] system clock frequency
 
@@ -43,13 +47,13 @@ void ADCInit()
     uint32_t pll_divisor = (pll_frequency - 1) / (16 * ADC_SAMPLING_RATE) + 1; //round up
 
     //////**************************** TESTING CODE
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4);    //timer 3 used for cpu stuff, let's use timer 4
-
-    TimerDisable(TIMER4_BASE, TIMER_BOTH);
-    TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC); //want TIMER_CFG_PERIODIC ?
-    TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/400000) - 1); // 10 ms interval (timeScale/20)
-
-    TimerControlTrigger(TIMER4_BASE, TIMER_A, true);
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4);    //timer 3 used for cpu stuff, let's use timer 4
+//
+//    TimerDisable(TIMER4_BASE, TIMER_BOTH);
+//    TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC); //want TIMER_CFG_PERIODIC ?
+//    TimerLoadSet(TIMER4_BASE, TIMER_A, (gSystemClock/400000) - 1); // 10 ms interval (timeScale/20)
+//
+//    TimerControlTrigger(TIMER4_BASE, TIMER_A, true);
 
     //////****************************
     ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor);
@@ -59,8 +63,8 @@ void ADCInit()
                                   // enable interrupt, and make it the end of sequence
     ADCSequenceEnable(ADC1_BASE, 0);       // enable the sequence.  it is now sampling
     ADCIntEnable(ADC1_BASE, 0);            // enable sequence 0 interrupt in the ADC1 peripheral
-    IntPrioritySet(INT_ADC1SS0, ADC1_INT_PRIORITY);          // set ADC1 sequence 0 interrupt priority
-    IntEnable(INT_ADC1SS0);               // enable ADC1 sequence 0 interrupt in int. controller
+    //IntPrioritySet(INT_ADC1SS0, ADC1_INT_PRIORITY);          // set ADC1 sequence 0 interrupt priority
+    //IntEnable(INT_ADC1SS0);               // enable ADC1 sequence 0 interrupt in int. controller
     //end lab 1 step 2
 }
 
@@ -79,8 +83,10 @@ void timerTriggerADC(uint32_t denominator){
 
 // ADC ISR
 
-void ADC_ISR(void)
+void ADC_ISR(UArg arg)
 {
+    //System_printf("Entered ADC_ISR\n");
+
     ADC1_ISC_R |=1 ; // clear ADC1 sequence0 interrupt flag in the ADCISC register
 #ifdef SampleTIMING
     debugPin0= 1;

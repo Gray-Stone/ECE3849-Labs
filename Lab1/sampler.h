@@ -32,7 +32,7 @@ extern volatile uint16_t sampleTemp2;
 
 
 void ADCInit();
-void ADC_ISR(void);
+void ADC_ISR();
 void alwaysTriggerADC(void);
 void timerTriggerADC(uint32_t denominator);
 

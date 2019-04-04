@@ -16,6 +16,8 @@
 #include <stdbool.h>
 #include "driverlib/interrupt.h"
 
+#include "sampler.h"
+
 uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
 
 /*
@@ -24,8 +26,10 @@ uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
 int main(void)
 {
     IntMasterDisable();
+    //System_printf("Entered Main()\n");
 
     // hardware initialization goes here
+    ADCInit();
 
     /* Start BIOS */
     BIOS_start();
@@ -38,6 +42,7 @@ void task0_func(UArg arg1, UArg arg2)
     IntMasterEnable();
 
     while (true) {
+        //System_printf("Entered task0\n");
         // do nothing
     }
 }
