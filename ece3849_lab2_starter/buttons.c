@@ -85,6 +85,7 @@ void btnClockSwi(UArg arg)
 {
     // post on semephone
     temp++;
+    Semaphore_post(btnSem);
 }
 
 void ButtonScanTask(UArg arg1, UArg arg2)
@@ -98,11 +99,11 @@ void ButtonScanTask(UArg arg1, UArg arg2)
     uint32_t presses;
 
 
-
     // read hardware button state
     while(1)
     {
         // pend on semaphone //
+        Semaphore_pend(btnSem,BIOS_WAIT_FOREVER);
 
         gpio_buttons =
                 ~GPIOPinRead(GPIO_PORTJ_BASE, 0xff) & (GPIO_PIN_1 | GPIO_PIN_0); // EK-TM4C1294XL buttons in positions 0 and 1
