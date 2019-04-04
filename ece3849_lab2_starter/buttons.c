@@ -25,6 +25,8 @@
 volatile uint32_t gButtons = 0; // debounced button state, one per bit in the lowest bits
 volatile uint32_t GPIO_STATE = 0;
 
+volatile uint32_t temp=0;
+
 #define FIFO_SIZE 10
 
                                 // button is pressed if its bit is 1, not pressed if 0
@@ -37,18 +39,6 @@ extern uint32_t gSystemClock;   // [Hz] system clock frequency
 // initialize all button and joystick handling hardware
 void ButtonInit(void)
 {
-    // initialize a general purpose timer for periodic interrupts
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-    TimerDisable(TIMER0_BASE, TIMER_BOTH);
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
-    TimerLoadSet(TIMER0_BASE, TIMER_A, (float)gSystemClock / BUTTON_SCAN_RATE - 0.5f);
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    TimerEnable(TIMER0_BASE, TIMER_BOTH);
-
-    // initialize interrupt controller to respond to timer interrupts
-    IntPrioritySet(INT_TIMER0A, BUTTON_INT_PRIORITY);
-    IntEnable(INT_TIMER0A);
-
     // GPIO PJ0 and PJ1 = EK-TM4C1294XL buttons 1 and 2
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
     GPIOPinTypeGPIOInput(GPIO_PORTJ_BASE, GPIO_PIN_0 | GPIO_PIN_1);
@@ -83,16 +73,79 @@ void ButtonInit(void)
     gADCSamplingRate = pll_frequency / (16 * pll_divisor); // actual sampling rate may differ from ADC_SAMPLING_RATE
     ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, pll_divisor); // only ADC0 has PLL clock divisor control
 
-
-
     // initialize ADC sampling sequence
     ADCSequenceDisable(ADC0_BASE, 0);
     ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
     ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH13);                             // Joystick HOR(X)
     ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH17 | ADC_CTL_IE | ADC_CTL_END);  // Joystick VER(Y)
     ADCSequenceEnable(ADC0_BASE, 0);
+}
+
+void btnClockSwi(UArg arg)
+{
+    // post on semephone
+    temp++;
+}
+
+void ButtonScanTask(UArg arg1, UArg arg2)
+{
+    // init variables
+    uint32_t gpio_buttons;
+    uint32_t but1;
+    uint32_t but2;
+    uint32_t sel;
+    uint32_t old_buttons;
+    uint32_t presses;
+
+
+
+    // read hardware button state
+    while(1)
+    {
+        // pend on semaphone //
+
+        gpio_buttons =
+                ~GPIOPinRead(GPIO_PORTJ_BASE, 0xff) & (GPIO_PIN_1 | GPIO_PIN_0); // EK-TM4C1294XL buttons in positions 0 and 1
+        but1 = (~GPIOPinRead(GPIO_PORTH_BASE, 0xff) & (GPIO_PIN_1)) << 1; //h1
+        but2 = (~GPIOPinRead(GPIO_PORTK_BASE, 0xff) & (GPIO_PIN_6)) >> 3; //k6
+        sel= (~GPIOPinRead(GPIO_PORTD_BASE, 0xff) & (GPIO_PIN_4)); //d4
+
+        gpio_buttons |= but1 | but2 | sel; //OR the states of the buttons together
+
+        old_buttons = gButtons;    // save previous button state
+        ButtonDebounce(gpio_buttons);       // Run the button debouncer. The result is in gButtons.
+        ButtonReadJoystick();               // Convert joystick state to button presses. The result is in gButtons.
+        presses = ~old_buttons & gButtons;   // detect button presses (transitions from not pressed to pressed)
+
+        GPIO_STATE = presses; //update the button states to display on the screen
+        if (GPIO_STATE>0 ) // push it into the stack
+        {
+            fifoPut(GPIO_STATE);
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // update the debounced button state gButtons
 void ButtonDebounce(uint32_t buttons)
@@ -162,27 +215,4 @@ uint32_t ButtonAutoRepeat(void)
     return presses;
 }
 
-// ISR for scanning and debouncing buttons
-void ButtonISR(void) {
-    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT); // clear interrupt flag
-    // read hardware button state
-    uint32_t gpio_buttons =
-            ~GPIOPinRead(GPIO_PORTJ_BASE, 0xff) & (GPIO_PIN_1 | GPIO_PIN_0); // EK-TM4C1294XL buttons in positions 0 and 1
-    uint32_t but1 = (~GPIOPinRead(GPIO_PORTH_BASE, 0xff) & (GPIO_PIN_1)) << 1; //h1
-    uint32_t but2 = (~GPIOPinRead(GPIO_PORTK_BASE, 0xff) & (GPIO_PIN_6)) >> 3; //k6
-    uint32_t sel= (~GPIOPinRead(GPIO_PORTD_BASE, 0xff) & (GPIO_PIN_4)); //d4
 
-    gpio_buttons |= but1 | but2 | sel; //OR the states of the buttons together
-
-    uint32_t old_buttons = gButtons;    // save previous button state
-    ButtonDebounce(gpio_buttons);       // Run the button debouncer. The result is in gButtons.
-    ButtonReadJoystick();               // Convert joystick state to button presses. The result is in gButtons.
-    uint32_t presses = ~old_buttons & gButtons;   // detect button presses (transitions from not pressed to pressed)
-
-    GPIO_STATE = presses; //update the button states to display on the screen
-    if (GPIO_STATE>0 ) // push it into the stack
-    {
-        fifoPut(GPIO_STATE);
-    }
-
-}

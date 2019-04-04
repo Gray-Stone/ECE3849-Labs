@@ -12,6 +12,14 @@
 
 #include <stdint.h>
 
+/* XDCtools Header files */
+#include <xdc/std.h>
+#include <xdc/runtime/System.h>
+#include <xdc/cfg/global.h>
+
+/* BIOS Header files */
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Task.h>
 
 #define BUTTON_COUNT 5				// number of buttons excluding joystick directions
 #define BUTTON_AND_JOYSTICK_COUNT 9 // number of buttons including joystick directions
@@ -52,5 +60,9 @@ void ButtonReadJoystick(void);
 
 // autorepeat button presses if a button is held long enough
 uint32_t ButtonAutoRepeat(void);
+
+void btnClockSwi(UArg arg);
+
+void ButtonScanTask(UArg arg1, UArg arg2);
 
 #endif /* BUTTONS_H_ */

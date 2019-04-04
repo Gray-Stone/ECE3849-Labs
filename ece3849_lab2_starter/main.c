@@ -17,6 +17,7 @@
 #include "driverlib/interrupt.h"
 
 #include "sampler.h"
+#include "buttons.h"
 
 uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
 
@@ -30,7 +31,7 @@ int main(void)
 
     // hardware initialization goes here
     ADCInit();
-
+    ButtonInit();
     /* Start BIOS */
     BIOS_start();
 
