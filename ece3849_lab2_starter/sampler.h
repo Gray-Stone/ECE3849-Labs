@@ -17,8 +17,7 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 
-//timing debug measuring option
-//#define SampleTIMING
+
 
 #define ADC1_INT_PRIORITY 0  // highest priority
 

@@ -10,6 +10,12 @@
 
 #include "inc/tm4c1294ncpdt.h"
 
+//timing debug measuring option
+//#define SampleTIMING
+
+//timing debug measuring option
+//#define TriggerTIMING
+
 
 void debugPinsInit();
 
