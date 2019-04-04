@@ -8,8 +8,17 @@
 #ifndef SAMPLER_H_
 #define SAMPLER_H_
 
+/* XDCtools Header files */
+#include <xdc/std.h>
+#include <xdc/runtime/System.h>
+#include <xdc/cfg/global.h>
+
+/* BIOS Header files */
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Task.h>
+
 //timing debug measuring option
-#define SampleTIMING
+//#define SampleTIMING
 
 #define ADC1_INT_PRIORITY 0  // highest priority
 
@@ -32,7 +41,7 @@ extern volatile uint16_t sampleTemp2;
 
 
 void ADCInit();
-void ADC_ISR(void);
+void ADC_ISR(UArg arg);
 void alwaysTriggerADC(void);
 void timerTriggerADC(uint32_t denominator);
 
