@@ -23,7 +23,6 @@
 
 // public globals
 volatile uint32_t gButtons = 0; // debounced button state, one per bit in the lowest bits
-volatile uint32_t GPIO_STATE = 0;
 
 volatile uint32_t temp=0;
 
@@ -97,6 +96,7 @@ void ButtonScanTask(UArg arg1, UArg arg2)
     uint32_t sel;
     uint32_t old_buttons;
     uint32_t presses;
+    volatile uint32_t GPIO_STATE = 0;
 
 
     // read hardware button state
@@ -121,7 +121,7 @@ void ButtonScanTask(UArg arg1, UArg arg2)
         GPIO_STATE = presses; //update the button states to display on the screen
         if (GPIO_STATE>0 ) // push it into the stack
         {
-            fifoPut(GPIO_STATE);
+            Mailbox_post ( btnMailbox, &GPIO_STATE, BIOS_NO_WAIT );
         }
     }
 
