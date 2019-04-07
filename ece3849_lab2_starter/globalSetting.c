@@ -14,10 +14,11 @@ struct Setting_Str
     uint16_t mVPerDiv  ; // set the voltage scale.
     uint32_t usPerDiv ; // set the time scale.
     char edgetype ;
+    const ti_sysbios_knl_Semaphore_Handle * handle ; // somehow this won't compile
     // maybe put the function names here to make it object-ish.
 };
 
-struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edgetype = 0 }  ;
+struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edgetype = 0 ,.handle = & settingSem   }  ;
 
 void settingsReset()
 {
@@ -26,6 +27,7 @@ void settingsReset()
     settings.mVPerDiv = 100;
     settings.usPerDiv = 20;
     settings.edgetype = 0;
+//    settings.handle = settingSem;
     // return a semaphore
 }
 
@@ -41,7 +43,7 @@ bool changeVoltPerDiv(char direction )
     case 500: settings.mVPerDiv = direction ? 1000 : 200; break;
     case 1000: settings.mVPerDiv = direction ? 1000 : 500;
     }
-    return true
+    return true;
 }
 
 bool changeTimePerDiv(char direction )

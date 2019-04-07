@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Crystalfontz128x128_ST7735.h"
+#include "globalSetting.h"
 
 tContext sContext;
 tRectangle rectFullScreen;
@@ -24,6 +25,23 @@ void screenInit()
     rectFullScreen = rectFullScreenLocal;
     GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 }
+
+
+
+
+void DisplayTask(UArg arg1, UArg arg2)
+{
+
+}
+
+
+
+
+
+
+
+
+
 
 
 void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t mVPerDiv, char edgetype, float cpu_load)
