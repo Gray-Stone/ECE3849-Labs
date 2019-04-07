@@ -14,11 +14,12 @@ struct Setting_Str
     uint16_t mVPerDiv  ; // set the voltage scale.
     uint32_t usPerDiv ; // set the time scale.
     char edgetype ;
-    const ti_sysbios_knl_Semaphore_Handle * handle ; // somehow this won't compile
+    settingGate
     // maybe put the function names here to make it object-ish.
+    // gate name is called settingGate
 };
 
-struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edgetype = 0 ,.handle = & settingSem   }  ;
+struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edgetype = 0   }  ;
 
 void settingsReset()
 {
@@ -27,13 +28,13 @@ void settingsReset()
     settings.mVPerDiv = 100;
     settings.usPerDiv = 20;
     settings.edgetype = 0;
-//    settings.handle = settingSem;
     // return a semaphore
 }
 
 bool changeVoltPerDiv(char direction )
 {
-
+    IArg keySettingGate;
+    keySettingGate = GateMutex_enter(settingGate);
     // semaphore check!
     // return false if can't access it.
     switch (settings.mVPerDiv)
@@ -43,6 +44,8 @@ bool changeVoltPerDiv(char direction )
     case 500: settings.mVPerDiv = direction ? 1000 : 200; break;
     case 1000: settings.mVPerDiv = direction ? 1000 : 500;
     }
+
+    GateMutex_leave(settingGate, keySettingGate);
     return true;
 }
 
