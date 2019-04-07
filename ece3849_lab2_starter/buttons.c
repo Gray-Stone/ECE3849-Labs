@@ -18,7 +18,6 @@
 #include "sysctl_pll.h"
 #include "buttons.h"
 #include "hwDebug.h"
-#include "btnFIFO.h"
 
 
 // public globals
@@ -79,6 +78,9 @@ void ButtonInit(void)
     ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH17 | ADC_CTL_IE | ADC_CTL_END);  // Joystick VER(Y)
     ADCSequenceEnable(ADC0_BASE, 0);
 }
+
+
+///////////////////////// Handling buttons ////////////////////////////
 
 void btnClockSwi(UArg arg)
 {
@@ -144,7 +146,7 @@ void ButtonScanTask(UArg arg1, UArg arg2)
 
 
 
-
+//////////// Helper Functions
 
 
 
