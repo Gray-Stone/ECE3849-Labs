@@ -20,12 +20,22 @@
 
 #include <stdbool.h>
 
+struct Setting_Str
+{
+    uint16_t mVPerDiv  ; // set the voltage scale.
+    uint32_t usPerDiv ; // set the time scale.
+    char edge ;
+    uint16_t triggerLevel ;
+    // gate name is called settingGate
+};
+
 
 extern struct Setting_Str settings ;
 
 void settingsReset();
 bool changeVoltPerDiv(char direction );
 bool changeTimePerDiv(char direction );
+bool changeTriggerEdge();
 
 
 

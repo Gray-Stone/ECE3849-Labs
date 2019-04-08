@@ -24,6 +24,7 @@
 #include "sampler.h"
 #include "buttons.h"
 #include "hwDebug.h"
+#include "globalSetting.h"
 
 
 
@@ -32,6 +33,8 @@ extern uint32_t gSystemClock;   // [Hz] system clock frequency
 volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
+
+uint16_t samples2Draw[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
 
 
 void ADCInit()
@@ -103,3 +106,84 @@ void ADC_ISR(UArg arg)
 #endif
 
 }
+
+
+// go though the gathered waveform trying to find a trigger case.
+// trigger on triggerFindSem
+void triggerFindTask (UArg arg1, UArg arg2)
+{
+    uint32_t i =0;
+    int32_t triggerIndex,  triggerIndexInit ,startIndex ;   // sotre the trigger locations.
+    uint16_t  sample, sampleFuture; // the two samples to compare to
+    bool triggerFound = false ;// determent if a trigger is found, reset to False every loop
+
+    uint16_t triggerLevel ;
+    char edgetype ;
+
+    while(1)
+
+        // wait for start
+        Semaphore_pend(triggerFindSem,BIOS_WAIT_FOREVER);
+
+        triggerLevel = settings.triggerLevel;
+        edgetype = settings.edge ;
+
+
+        //initialize the trigger index, and preserve it:
+        triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);   //half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
+        triggerIndexInit = triggerIndex;                        //log the initial trigger index, if nothing found the initial index is going to be used
+        startIndex = ADC_BUFFER_WRAP( triggerIndexInit - (SCREENSIZE/2) );  // starting point for recording waveform.
+
+
+        triggerFound = false;
+
+        sample = gADCBuffer[triggerIndex]; //read the initial sample at this index location
+
+        while (triggerIndex != ADC_BUFFER_WRAP( triggerIndexInit - (ADC_BUFFER_SIZE / 2))) // keep looping until trigger is about to hit the newly read data.
+        {
+            triggerIndex = ADC_BUFFER_WRAP(triggerIndex - 1);
+            sampleFuture = sample;
+            sample =  gADCBuffer[triggerIndex];
+            if (triggerCheck ( sample, sampleFuture, triggerLevel, edgetype ) ) // found a rising edge at trigger
+            {
+                startIndex = ADC_BUFFER_WRAP( triggerIndex - (SCREENSIZE/2) );
+                triggerFound = true ;
+            }
+        }
+
+
+//        if (triggerFound) { ; }                     // This is left for normal trigger mode
+
+        for (i = 0; i < SCREENSIZE ; i++)           // careful about 0 index.
+        {
+            samples2Draw[i] = gADCBuffer[ADC_BUFFER_WRAP ( startIndex + i) ];
+        }
+        // signal processing task
+}
+
+
+
+bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype) // edgetype 0 for rising, 1 for falling.
+{
+    if (edgetype == 0 )
+    {
+        if ( sample < triggerLevel && sampleFuture >= triggerLevel ) // rising edge case
+                return true ;
+    }
+    else
+    {
+        if ( sample > triggerLevel && sampleFuture <= triggerLevel )    // falling edge case.
+               return true ;
+    }
+   return false;
+}
+
+
+
+
+
+
+
+
+
+

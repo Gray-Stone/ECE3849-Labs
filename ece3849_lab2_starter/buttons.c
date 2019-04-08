@@ -19,6 +19,8 @@
 #include "buttons.h"
 #include "hwDebug.h"
 
+#include "globalSetting.h"
+
 
 // public globals
 volatile uint32_t gButtons = 0; // debounced button state, one per bit in the lowest bits
@@ -89,6 +91,7 @@ void btnClockSwi(UArg arg)
     Semaphore_post(btnSem);
 }
 
+// checking all the puttongs. Signal by Swi timer. high Priority (12)
 void ButtonScanTask(UArg arg1, UArg arg2)
 {
     // init variables
@@ -120,6 +123,7 @@ void ButtonScanTask(UArg arg1, UArg arg2)
         ButtonReadJoystick();               // Convert joystick state to button presses. The result is in gButtons.
         presses = ~old_buttons & gButtons;   // detect button presses (transitions from not pressed to pressed)
 
+        xdc_Ptr
         GPIO_STATE = presses; //update the button states to display on the screen
         if (GPIO_STATE>0 ) // push it into the stack
         {
@@ -129,24 +133,42 @@ void ButtonScanTask(UArg arg1, UArg arg2)
 
 }
 
+// trigerd by mailbox, change global settings.
+void settingUpdateTask (UArg arg1, UArg arg2) // Medium priority (8
+{
+    static volatile uint32_t btnData;
 
+    Mailbox_post ( btnMailbox, &btnData, BIOS_WAIT_FOREVER  );
 
+    // Booster Pack btn S1 change trigger.  0x0004
+    // Booster Pack btn S2 change run/stop. 0x0008
+    // Booster Pack joy up increase V/div   0x0080
+    // Booster Pack joy down decrease V/div 0x0100
+    // Booster Pack joy Left more us/div    0x0040
+    // Booster Pack joy Right less us/div   0x0020
+    if ( btnData & 0x0004 ) // case of flip triggerType
+        changeTriggerEdge();
+    if ( btnData & 0x0008 ) // case of btnS2 is pushed.
+        ; // currently we don't care about this.
+    if ( btnData & 0x0080 ) // case of increase voltage scale.
+        changeVoltPerDiv(1);
+    if ( btnData & 0x0100 ) // case of decrease voltage scale
+        changeVoltPerDiv(0);
+    if (btnData & 0x0040)   // case of increase time scale
+        changeTimePerDiv(1);
+    if (btnData & 0x0020)   // case of decrease time scale
+        changeTimePerDiv(0);
 
-
-
-
-
-
-
-
-
-
+    // Maybe this need to signal redraw?
+}
 
 
 
 
 
 //////////// Helper Functions
+
+
 
 
 

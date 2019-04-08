@@ -9,31 +9,27 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct Setting_Str
-{
-    uint16_t mVPerDiv  ; // set the voltage scale.
-    uint32_t usPerDiv ; // set the time scale.
-    char edgetype ;
-    settingGate
-    // maybe put the function names here to make it object-ish.
-    // gate name is called settingGate
-};
+#include "sampler.h"
 
-struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edgetype = 0   }  ;
+
+struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edge = 0 , .triggerLevel = ADC_OFFSET  }  ;
 
 void settingsReset()
 {
-    // add some checking about reentrant
-    // take a semaphore
+    static IArg keySettingGate;
+    keySettingGate = GateMutex_enter(settingGate);
+
     settings.mVPerDiv = 100;
     settings.usPerDiv = 20;
-    settings.edgetype = 0;
-    // return a semaphore
+    settings.edge = 0;
+    settings.triggerLevel = ADC_OFFSET;
+    GateMutex_leave(settingGate, keySettingGate);
+
 }
 
 bool changeVoltPerDiv(char direction )
 {
-    IArg keySettingGate;
+    static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
     // semaphore check!
     // return false if can't access it.
@@ -49,8 +45,23 @@ bool changeVoltPerDiv(char direction )
     return true;
 }
 
+bool changeTriggerEdge()
+{
+    static IArg keySettingGate;
+    keySettingGate = GateMutex_enter(settingGate);
+
+    settings.edge^=0x01 ;
+
+    GateMutex_leave(settingGate, keySettingGate);
+
+}
+
+
 bool changeTimePerDiv(char direction )
 {
+    static IArg keySettingGate;
+    keySettingGate = GateMutex_enter(settingGate);
+
 
 //    switch (oldTimePerDiv)
 //    {
@@ -78,4 +89,5 @@ bool changeTimePerDiv(char direction )
 //        break;
 //    }
 //    return newTimePerDiv;
+    GateMutex_leave(settingGate, keySettingGate);
 }
