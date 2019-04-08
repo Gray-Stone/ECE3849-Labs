@@ -108,8 +108,8 @@ void ADC_ISR(UArg arg)
 }
 
 
-// go though the gathered waveform trying to find a trigger case.
-// trigger on triggerFindSem
+// go though the gathered waveform trying to find a trigger case. priority 14
+//trigger on triggerFindSem
 void triggerFindTask (UArg arg1, UArg arg2)
 {
     uint32_t i =0;
@@ -121,7 +121,7 @@ void triggerFindTask (UArg arg1, UArg arg2)
     char edgetype ;
 
     while(1)
-
+    {
         // wait for start
         Semaphore_pend(triggerFindSem,BIOS_WAIT_FOREVER);
 
@@ -133,7 +133,6 @@ void triggerFindTask (UArg arg1, UArg arg2)
         triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);   //half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
         triggerIndexInit = triggerIndex;                        //log the initial trigger index, if nothing found the initial index is going to be used
         startIndex = ADC_BUFFER_WRAP( triggerIndexInit - (SCREENSIZE/2) );  // starting point for recording waveform.
-
 
         triggerFound = false;
 
@@ -158,7 +157,8 @@ void triggerFindTask (UArg arg1, UArg arg2)
         {
             samples2Draw[i] = gADCBuffer[ADC_BUFFER_WRAP ( startIndex + i) ];
         }
-        // signal processing task
+        Semaphore_post(processingSem);
+    }
 }
 
 

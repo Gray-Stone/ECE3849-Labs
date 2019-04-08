@@ -6,7 +6,7 @@
  */
 
 #include"screenControl.h"
-#include "sampler.h" //needed for defines
+#include "sampler.h" //needed for samples2Draw
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,10 +28,20 @@ void screenInit()
 
 void ProcessingTask(UArg arg1, UArg arg2) { //4
 
+    Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
+
+    samples2Draw;
+
+
+    Semaphore_post(triggerFindSem);
+    Semaphore_post(displaySem);
+
 }
 
 void DisplayTask(UArg arg1, UArg arg2) //6
 {
+    Semaphore_pend(displaySem,BIOS_WAIT_FOREVER);
+
 
 }
 
