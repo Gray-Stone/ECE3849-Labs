@@ -18,7 +18,7 @@
 //tRectangle rectFullScreen;
 
 uint16_t processedWaveform[SCREENSIZE];
-bool processedFlag = false ; // false is good for write. True is good for read
+volatile bool processedFlag = false ; // false is good for write. True is good for read
 
 
 
@@ -70,7 +70,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
     rectFullScreen = rectFullScreenLocal;
     GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 
-    unsigned char localWaveform[SCREENSIZE];
+    uint16_t localWaveform[SCREENSIZE];
 
     int i, pastY;
 
