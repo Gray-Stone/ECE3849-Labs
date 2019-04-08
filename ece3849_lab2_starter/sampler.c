@@ -112,6 +112,7 @@ void ADC_ISR(UArg arg)
 //trigger on triggerFindSem
 void triggerFindTask (UArg arg1, UArg arg2)
 {
+    ADCInit();
     uint32_t i =0;
     int32_t triggerIndex,  triggerIndexInit ,startIndex ;   // sotre the trigger locations.
     uint16_t  sample, sampleFuture; // the two samples to compare to

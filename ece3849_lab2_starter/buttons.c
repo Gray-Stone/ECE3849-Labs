@@ -94,6 +94,8 @@ void btnClockSwi(UArg arg)
 // checking all the puttongs. Signal by Swi timer. high Priority (12)
 void ButtonScanTask(UArg arg1, UArg arg2)
 {
+
+    ButtonInit();
     // init variables
     uint32_t gpio_buttons;
     uint32_t but1;

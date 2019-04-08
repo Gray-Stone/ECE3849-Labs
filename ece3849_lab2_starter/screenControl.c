@@ -17,7 +17,7 @@
 tContext sContext;
 tRectangle rectFullScreen;
 
-unsigned char processedWaveform[SCREENSIZE];
+uint16_t processedWaveform[SCREENSIZE];
 bool processedFlag = false ; // false is good for write. True is good for read
 
 
@@ -33,15 +33,24 @@ void screenInit()
 }
 
 void ProcessingTask(UArg arg1, UArg arg2) { //4
-
+    unsigned char x =0;
+    float fVoltsPerDiv ;
+    float fScale ;
 
     while(1)
     {
-
         Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
 
-        waveformBuffer;
+        processedFlag = false ; // there should never be a case of processing is started and flag is true.
 
+        fVoltsPerDiv = ((float) (settings.mVPerDiv) )/1000;
+        fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
+        for(x=0; x<SCREENSIZE ; ++x )
+        {
+            processedWaveform[x] = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)waveformBuffer[x] - ADC_OFFSET));
+        }
+
+        processedFlag= true;        // mark the buffer is holding newer content.
 
         Semaphore_post(triggerFindSem);
         Semaphore_post(displaySem);

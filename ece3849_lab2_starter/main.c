@@ -29,9 +29,8 @@ int main(void)
     IntMasterDisable();
     //System_printf("Entered Main()\n");
 
-    // hardware initialization goes here
-    ADCInit();
-    ButtonInit();
+    // hardware initialization goes in front of the tasks
+    debugPinsInit();
     /* Start BIOS */
     BIOS_start();
 
