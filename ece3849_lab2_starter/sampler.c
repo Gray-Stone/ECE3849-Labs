@@ -34,7 +34,7 @@ volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 
-uint16_t samples2Draw[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
+uint16_t waveformBuffer[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
 
 
 void ADCInit()
@@ -150,12 +150,11 @@ void triggerFindTask (UArg arg1, UArg arg2)
             }
         }
 
-
 //        if (triggerFound) { ; }                     // This is left for normal trigger mode
 
         for (i = 0; i < SCREENSIZE ; i++)           // careful about 0 index.
         {
-            samples2Draw[i] = gADCBuffer[ADC_BUFFER_WRAP ( startIndex + i) ];
+            waveformBuffer[i] = gADCBuffer[ADC_BUFFER_WRAP ( startIndex + i) ];
         }
         Semaphore_post(processingSem);
     }

@@ -9,12 +9,18 @@
 #include "sampler.h" //needed for samples2Draw
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include "Crystalfontz128x128_ST7735.h"
 #include "globalSetting.h"
 
 tContext sContext;
 tRectangle rectFullScreen;
+
+unsigned char processedWaveform[SCREENSIZE];
+bool processedFlag = false ; // false is good for write. True is good for read
+
+
 
 void screenInit()
 {
@@ -28,13 +34,18 @@ void screenInit()
 
 void ProcessingTask(UArg arg1, UArg arg2) { //4
 
-    Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
 
-    samples2Draw;
+    while(1)
+    {
+
+        Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
+
+        waveformBuffer;
 
 
-    Semaphore_post(triggerFindSem);
-    Semaphore_post(displaySem);
+        Semaphore_post(triggerFindSem);
+        Semaphore_post(displaySem);
+    }
 
 }
 

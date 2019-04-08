@@ -55,7 +55,7 @@
 
      GateMutex_leave(settingGate, keySettingGate);
 
- }
+}
 
 
  bool changeTimePerDiv(char direction )

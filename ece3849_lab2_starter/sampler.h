@@ -38,7 +38,7 @@ extern volatile uint32_t gADCErrors;                       // number of missed A
 
 extern volatile uint16_t sampleTemp;
 extern volatile uint16_t sampleTemp2;
-extern uint16_t samples2Draw[SCREENSIZE];
+extern uint16_t waveformBuffer[SCREENSIZE];
 
 
 void ADCInit();
