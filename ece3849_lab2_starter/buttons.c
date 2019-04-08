@@ -138,7 +138,7 @@ void settingUpdateTask (UArg arg1, UArg arg2) // Medium priority (8
 {
     static volatile uint32_t btnData;
 
-    Mailbox_post ( btnMailbox, &btnData, BIOS_WAIT_FOREVER  );
+    Mailbox_pend ( btnMailbox, &btnData, BIOS_WAIT_FOREVER  );
 
     // Booster Pack btn S1 change trigger.  0x0004
     // Booster Pack btn S2 change run/stop. 0x0008
