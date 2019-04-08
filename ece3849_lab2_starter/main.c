@@ -28,6 +28,10 @@ int main(void)
 {
     IntMasterDisable();
     //System_printf("Entered Main()\n");
+    ADCInit();
+    screenInit();
+    ButtonInit();
+
 
     // hardware initialization goes in front of the tasks
     debugPinsInit();

@@ -95,7 +95,7 @@ void btnClockSwi(UArg arg)
 void ButtonScanTask(UArg arg1, UArg arg2)
 {
 
-    ButtonInit();
+//    ButtonInit();
     // init variables
     uint32_t gpio_buttons;
     uint32_t but1;

@@ -107,16 +107,19 @@ void ADC_ISR(UArg arg)
 
 }
 
+bool triggerFound = false ;// determent if a trigger is found, reset to False every loop
+
 
 // go though the gathered waveform trying to find a trigger case. priority 14
 //trigger on triggerFindSem
 void triggerFindTask (UArg arg1, UArg arg2)
 {
-    ADCInit();
+//    ADCInit();
+    IntMasterEnable();
+
     uint32_t i =0;
     int32_t triggerIndex,  triggerIndexInit ,startIndex ;   // sotre the trigger locations.
     uint16_t  sample, sampleFuture; // the two samples to compare to
-    bool triggerFound = false ;// determent if a trigger is found, reset to False every loop
 
     uint16_t triggerLevel ;
     char edgetype ;
