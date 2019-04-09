@@ -70,7 +70,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 //    rectFullScreen = rectFullScreenLocal;
 //    GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 
-    uint16_t localWaveform[SCREENSIZE];
+    int localWaveform[SCREENSIZE];
 
     int i, pastY;
 
