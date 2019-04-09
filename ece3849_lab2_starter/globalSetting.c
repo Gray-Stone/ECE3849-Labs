@@ -20,9 +20,9 @@
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
 
-     settings.mVPerDiv = 100;
-    settings.usPerDiv = 20;
-    settings.edge = 0;
+     settings.mVPerDiv = 500 ;
+    settings.usPerDiv = 20 ;
+    settings.edge = 0 ;
     settings.triggerLevel = ADC_OFFSET;
     GateMutex_leave(settingGate, keySettingGate);
 
@@ -39,7 +39,8 @@
     case 100: settings.mVPerDiv = direction ? 200 : 100; break;
     case 200: settings.mVPerDiv = direction ? 500 : 100; break;
     case 500: settings.mVPerDiv = direction ? 1000 : 200; break;
-    case 1000: settings.mVPerDiv = direction ? 1000 : 500;
+    case 1000: settings.mVPerDiv = direction ? 1000 : 500; break;
+    default : 500
     }
 
      GateMutex_leave(settingGate, keySettingGate);

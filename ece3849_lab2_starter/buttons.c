@@ -168,11 +168,7 @@ void settingUpdateTask (UArg arg1, UArg arg2) // Medium priority (8
 
 
 
-
-
 //////////// Helper Functions
-
-
 
 
 
