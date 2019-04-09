@@ -46,10 +46,10 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
     x = 0;
     float fVoltsPerDiv ;
     float fScale ;
-    char kiss_fft_cfg_buffer[KISS_FFT_CFG_SIZE];// Kiss FFT config memory
+    static char kiss_fft_cfg_buffer[KISS_FFT_CFG_SIZE];// Kiss FFT config memory
     size_t buffer_size = KISS_FFT_CFG_SIZE;
     kiss_fft_cfg cfg;               //   Kiss FFT config
-    kiss_fft_cpx in[NFFT], out[NFFT]; //   complex waveform and spectrum buffers
+    static kiss_fft_cpx in[NFFT], out[NFFT]; //   complex waveform and spectrum buffers
     int i;
     i = 0;
 
@@ -69,7 +69,7 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
             kiss_fft(cfg, in, out);      // compute FFT
             // convert first 128 bins of out[] to dB for display
             for(i = 0; i < SCREENSIZE; i++) {
-                processedWaveform[i] = out[i].r;
+                processedWaveform[i] = log10f(out[i].r) + 128;
             }
          }
         else {
