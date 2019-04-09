@@ -12,6 +12,15 @@
 #include <stdbool.h>
 #include <string.h>
 #include "Crystalfontz128x128_ST7735.h"
+
+#include <math.h>
+#include "kiss_fft.h"
+#include "_kiss_fft_guts.h"
+#define PI 3.14159265358979f
+#define NFFT 1024 // FFT length
+#define KISS_FFT_CFG_SIZE (sizeof(struct kiss_fft_state)+sizeof(kiss_fft_cpx)*(NFFT-1))
+
+
 #include "globalSetting.h"
 
 tContext sContext;
@@ -36,21 +45,38 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
     unsigned char x =0;
     float fVoltsPerDiv ;
     float fScale ;
+    char kiss_fft_cfg_buffer[KISS_FFT_CFG_SIZE];// Kiss FFT config memory
+    size_t buffer_size = KISS_FFT_CFG_SIZE;
+    kiss_fft_cfg cfg;               //   Kiss FFT config
+    kiss_fft_cpx in[NFFT], out[NFFT]; //   complex waveform and spectrum buffers
+    int i;
+
+    cfg = kiss_fft_alloc(NFFT, 0, kiss_fft_cfg_buffer, &buffer_size);// init Kiss FFT
 
     while(1)
     {
         Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
 
-        processedFlag = false ; // there should never be a case of processing is started and flag is true.
+        if (settings.FFT) {
+            for(i = 0; i < NFFT; i++) {// generate an input waveform
+                in[i].r = FFTBuffer[i]; // real part of waveform
+                in[i].i = 0; // imaginary part of waveform
+             }
+            kiss_fft(cfg, in, out);      // compute FFT
+            // convert first 128 bins of out[] to dB for display
+         }
+        else {
+            processedFlag = false ; // there should never be a case of processing is started and flag is true.
 
-        fVoltsPerDiv = ((float) (settings.mVPerDiv) )/1000;
-        fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
-        for(x=0; x<SCREENSIZE ; ++x )
-        {
-            processedWaveform[x] = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)waveformBuffer[x] - ADC_OFFSET));
+            fVoltsPerDiv = ((float) (settings.mVPerDiv) )/1000;
+            fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
+            for(x=0; x<SCREENSIZE ; ++x )
+            {
+                processedWaveform[x] = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)waveformBuffer[x] - ADC_OFFSET));
+            }
+
+            processedFlag= true;        // mark the buffer is holding newer content.
         }
-
-        processedFlag= true;        // mark the buffer is holding newer content.
 
         Semaphore_post(triggerFindSem);
         Semaphore_post(displaySem);
