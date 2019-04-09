@@ -163,6 +163,7 @@ void settingUpdateTask (UArg arg1, UArg arg2) // Medium priority (8
             changeTimePerDiv(0);
 
         // Maybe this need to signal redraw?
+        Semaphore_post(displaySem);
     }
 }
 
