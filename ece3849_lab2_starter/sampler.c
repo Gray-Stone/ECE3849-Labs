@@ -36,6 +36,9 @@ volatile uint32_t gADCErrors;                       // number of missed ADC dead
 
 uint16_t waveformBuffer[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
 
+uint16_t FFTBuffer[FFTBufferSize ];
+
+
 
 void ADCInit()
 {
@@ -129,6 +132,14 @@ void triggerFindTask (UArg arg1, UArg arg2)
         // wait for start
         Semaphore_pend(triggerFindSem,BIOS_WAIT_FOREVER);
 
+        if (settings.FFT)
+        {
+            triggerIndex = gADCBufferIndex ;
+            for ( i=0;i< FFTBufferSize ; ++i )
+                FFTBuffer[i] = gADCBuffer[ ADC_BUFFER_WRAP(triggerIndex + i) ];
+            goto endloopTag;
+
+        }
         triggerLevel = settings.triggerLevel;
         edgetype = settings.edge ;
 
@@ -160,6 +171,8 @@ void triggerFindTask (UArg arg1, UArg arg2)
         {
             waveformBuffer[i] = gADCBuffer[ADC_BUFFER_WRAP ( startIndex + i) ];
         }
+
+        endloopTag:
         Semaphore_post(processingSem);
     }
 }

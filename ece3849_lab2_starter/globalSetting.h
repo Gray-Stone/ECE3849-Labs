@@ -37,6 +37,7 @@ void settingsReset();
 bool changeVoltPerDiv(char direction );
 bool changeTimePerDiv(char direction );
 bool changeTriggerEdge();
+bool changeFFTMode();
 
 
 

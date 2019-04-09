@@ -28,7 +28,7 @@
 #define ADC_BITS 12             //number of bits in the ADC
 #define SCREENSIZE 128          // number of pixs across screen
 
-
+#define FFTBufferSize 1024
 
 
 

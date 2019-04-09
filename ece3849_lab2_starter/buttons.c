@@ -152,7 +152,7 @@ void settingUpdateTask (UArg arg1, UArg arg2) // Medium priority (8
         if ( btnData & 0x0004 ) // case of flip triggerType
             changeTriggerEdge();
         if ( btnData & 0x0008 ) // case of btnS2 is pushed.
-            ; // currently we don't care about this.
+            changeFFTMode(); // currently we don't care about this.
         if ( btnData & 0x0080 ) // case of increase voltage scale.
             changeVoltPerDiv(1);
         if ( btnData & 0x0100 ) // case of decrease voltage scale

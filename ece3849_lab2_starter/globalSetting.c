@@ -13,7 +13,7 @@
  #include "sampler.h"
 
 
- struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edge = 0 , .triggerLevel = ADC_OFFSET , .FFT = False  }  ;
+ struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edge = 0 , .triggerLevel = ADC_OFFSET , .FFT = 0  }  ;
 
  void settingsReset()
 {
