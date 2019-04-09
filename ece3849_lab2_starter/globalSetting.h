@@ -26,6 +26,7 @@ struct Setting_Str
     uint32_t usPerDiv ; // set the time scale.
     char edge ;
     uint16_t triggerLevel ;
+    char FFT;
     // gate name is called settingGate
 };
 

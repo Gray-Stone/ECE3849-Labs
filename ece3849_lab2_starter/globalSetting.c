@@ -13,20 +13,22 @@
  #include "sampler.h"
 
 
- struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edge = 0 , .triggerLevel = ADC_OFFSET  }  ;
+ struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edge = 0 , .triggerLevel = ADC_OFFSET , .FFT = False  }  ;
 
  void settingsReset()
 {
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
 
-     settings.mVPerDiv = 500 ;
+    settings.mVPerDiv = 500 ;
     settings.usPerDiv = 20 ;
     settings.edge = 0 ;
     settings.triggerLevel = ADC_OFFSET;
     GateMutex_leave(settingGate, keySettingGate);
-
  }
+
+
+
 
  bool changeVoltPerDiv(char direction )
 {
@@ -51,11 +53,16 @@
 {
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
+    settings.edge^=0x01 ;
+    GateMutex_leave(settingGate, keySettingGate);
+}
 
-     settings.edge^=0x01 ;
-
+bool changeFFTMode()
+{
+    static IArg keySettingGate;
+    keySettingGate = GateMutex_enter(settingGate);
+     settings.FFT^=0x01 ;
      GateMutex_leave(settingGate, keySettingGate);
-
 }
 
 
