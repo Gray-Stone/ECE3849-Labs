@@ -40,7 +40,7 @@
     case 200: settings.mVPerDiv = direction ? 500 : 100; break;
     case 500: settings.mVPerDiv = direction ? 1000 : 200; break;
     case 1000: settings.mVPerDiv = direction ? 1000 : 500; break;
-    default : 500
+    default : settings.mVPerDiv = 500;
     }
 
      GateMutex_leave(settingGate, keySettingGate);
