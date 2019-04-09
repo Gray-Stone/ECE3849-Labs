@@ -69,7 +69,7 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
             kiss_fft(cfg, in, out);      // compute FFT
             // convert first 128 bins of out[] to dB for display
             for(i = 0; i < SCREENSIZE; i++) {
-                processedWaveform[i] = (log10f(out[i].r));
+                processedWaveform[i] = ((int)(-20* log10f(sqrt((out[i].r*out[i].r) + (out[i].i*out[i].i))))) + 150;
             }
          }
         else {
