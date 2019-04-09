@@ -42,7 +42,8 @@ void screenInit()
 }
 
 void ProcessingTask(UArg arg1, UArg arg2) { //4
-    unsigned char x =0;
+    unsigned char x;
+    x = 0;
     float fVoltsPerDiv ;
     float fScale ;
     char kiss_fft_cfg_buffer[KISS_FFT_CFG_SIZE];// Kiss FFT config memory
@@ -50,12 +51,15 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
     kiss_fft_cfg cfg;               //   Kiss FFT config
     kiss_fft_cpx in[NFFT], out[NFFT]; //   complex waveform and spectrum buffers
     int i;
+    i = 0;
 
     cfg = kiss_fft_alloc(NFFT, 0, kiss_fft_cfg_buffer, &buffer_size);// init Kiss FFT
 
     while(1)
     {
         Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
+
+        processedFlag = false ; // there should never be a case of processing is started and flag is true.
 
         if (settings.FFT) {
             for(i = 0; i < NFFT; i++) {// generate an input waveform
@@ -64,9 +68,11 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
              }
             kiss_fft(cfg, in, out);      // compute FFT
             // convert first 128 bins of out[] to dB for display
+            for(i = 0; i < SCREENSIZE; i++) {
+                processedWaveform[i] = out[i].r;
+            }
          }
         else {
-            processedFlag = false ; // there should never be a case of processing is started and flag is true.
 
             fVoltsPerDiv = ((float) (settings.mVPerDiv) )/1000;
             fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
@@ -75,8 +81,8 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
                 processedWaveform[x] = LCD_VERTICAL_MAX/2 - (int)roundf(fScale * ((int)waveformBuffer[x] - ADC_OFFSET));
             }
 
-            processedFlag= true;        // mark the buffer is holding newer content.
         }
+        processedFlag= true;        // mark the buffer is holding newer content.
 
         Semaphore_post(triggerFindSem);
         Semaphore_post(displaySem);
