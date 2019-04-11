@@ -27,6 +27,7 @@ tContext sContext;
 tRectangle rectFullScreen;
 
 int processedWaveform[SCREENSIZE];
+float w[NFFT]; //window function values
 volatile bool processedFlag = false ; // false is good for write. True is good for read
 
 
@@ -55,6 +56,11 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
 
     cfg = kiss_fft_alloc(NFFT, 0, kiss_fft_cfg_buffer, &buffer_size);// init Kiss FFT
 
+    //generate window function
+    for (i = 0; i < NFFT; i++) {
+        w[i] = 0.42f - 0.5f * cosf(2*PI*i/(NFFT - 1)) + 0.08f * cosf(4*PI*i/(NFFT - 1));
+    }
+
     while(1)
     {
         Semaphore_pend(processingSem,BIOS_WAIT_FOREVER);
@@ -62,6 +68,10 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
         processedFlag = false ; // there should never be a case of processing is started and flag is true.
 
         if (settings.FFT) {
+
+            for (i = 0; i < NFFT; i++)
+                FFTBuffer[i] = FFTBuffer[i] * w[i];
+
             for(i = 0; i < NFFT; i++) {// generate an input waveform
                 in[i].r = FFTBuffer[i]; // real part of waveform
                 in[i].i = 0; // imaginary part of waveform
@@ -104,7 +114,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
     int localWaveform[SCREENSIZE];
 
-    int i, pastY, drawGridStart;
+    int i, pastY;
 
     while(1) {
         Semaphore_pend(displaySem,BIOS_WAIT_FOREVER);
@@ -116,7 +126,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
             processedFlag = false;
         }
 
-        drawGridStart = (settings.FFT) ? 0 : 3;
+        //drawGridStart = (settings.FFT) ? 0 : 3;
 
 
         GrContextForegroundSet(&sContext, ClrBlack);
@@ -124,9 +134,11 @@ void DisplayTask(UArg arg1, UArg arg2) //6
         GrContextForegroundSet(&sContext, ClrBlue); //blue grid lines
 
         //draw grid
-        for (i = drawGridStart; i < 128; i+= PIXELS_PER_DIV) {
-            GrLineDraw(&sContext, i, 0, i, 127); //vertical lines
+        for (i = 3; i < 128; i+= PIXELS_PER_DIV) {
             GrLineDraw(&sContext, 0, i, 127, i); //horizontal lines
+            i = settings.FFT ? i - 3 : i; //takes care of vertical line shift for FFt grid
+            GrLineDraw(&sContext, i, 0, i, 127); //vertical lines
+
         }
 
         GrContextForegroundSet(&sContext, ClrYellow); // yellow for samples
@@ -141,23 +153,28 @@ void DisplayTask(UArg arg1, UArg arg2) //6
         }
         GrContextForegroundSet(&sContext, ClrWhite); //white text
         char str1[50];   // string buffer line 1
-        char str2[50];  //string buffer line 2
+        //char str2[50];  //string buffer line 2
         char edgeString[10]; //string buffer for edge display string
         char voltString[10]; //string buffer for voltage scale display string
 
-        if (settings.mVPerDiv == 1000)
-            strcpy(voltString, "  1  V");
-        else
-            snprintf(voltString, 10, "%u mV\0", settings.mVPerDiv);
-        if (settings.edge == 0)
-            strcpy(edgeString, "rise");
-        else
-            strcpy(edgeString, "fall");
+        if (settings.FFT) { //labels for FFT screen
+            snprintf(str1, 50, "20 kHz  20 dBV\0");
+        }
+        else { //labels for normal scope screen
+            if (settings.mVPerDiv == 1000)
+                strcpy(voltString, "  1  V");
+            else
+                snprintf(voltString, 10, "%u mV\0", settings.mVPerDiv);
+            if (settings.edge == 0)
+                strcpy(edgeString, "rise");
+            else
+                strcpy(edgeString, "fall");
 
-        snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
-        snprintf(str2, 50, "CPU Load: %.5f%", 0);//cpu_load*100); //Settings status bar
+            snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
+        }
+        //snprintf(str2, 50, "CPU Load: %.5f%", 0);//cpu_load*100); //Settings status bar
         GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
-        GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
+        //GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
 
         GrFlush(&sContext); // flush the frame buffer to the LCD
 
