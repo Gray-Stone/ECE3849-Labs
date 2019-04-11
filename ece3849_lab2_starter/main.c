@@ -25,6 +25,8 @@ uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
  *  ======== main ========
  */
 int main(void)
+
+
 {
     IntMasterDisable();
     //System_printf("Entered Main()\n");

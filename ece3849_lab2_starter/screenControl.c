@@ -104,7 +104,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
     int localWaveform[SCREENSIZE];
 
-    int i, pastY;
+    int i, pastY, drawGridStart;
 
     while(1) {
         Semaphore_pend(displaySem,BIOS_WAIT_FOREVER);
@@ -116,13 +116,15 @@ void DisplayTask(UArg arg1, UArg arg2) //6
             processedFlag = false;
         }
 
+        drawGridStart = (settings.FFT) ? 0 : 3;
+
 
         GrContextForegroundSet(&sContext, ClrBlack);
         GrRectFill(&sContext, &rectFullScreen); // fill screen with black background
         GrContextForegroundSet(&sContext, ClrBlue); //blue grid lines
 
         //draw grid
-        for (i = 3; i < 128; i+= PIXELS_PER_DIV) {
+        for (i = drawGridStart; i < 128; i+= PIXELS_PER_DIV) {
             GrLineDraw(&sContext, i, 0, i, 127); //vertical lines
             GrLineDraw(&sContext, 0, i, 127, i); //horizontal lines
         }
