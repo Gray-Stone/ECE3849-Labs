@@ -127,7 +127,7 @@ void ButtonScanTask(UArg arg1, UArg arg2)
         presses = ~old_buttons & gButtons;   // detect button presses (transitions from not pressed to pressed)
 
         GPIO_STATE = presses; //update the button states to display on the screen
-        if (GPIO_STATE>0 ) // push it into the stack
+        if (GPIO_STATE>0 ) // push it into the mailbox
         {
             Mailbox_post ( btnMailbox, &GPIO_STATE, BIOS_NO_WAIT );
         }
@@ -169,7 +169,7 @@ void settingUpdateTask (UArg arg1, UArg arg2) // Medium priority (8
 
 
 
-//////////// Helper Functions
+//////////// Helper Functions ///////
 
 
 

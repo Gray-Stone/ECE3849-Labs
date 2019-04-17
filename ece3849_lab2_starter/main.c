@@ -18,6 +18,7 @@
 
 #include "sampler.h"
 #include "buttons.h"
+#include "screenControl.h"
 
 uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
 
@@ -28,21 +29,21 @@ int main(void)
 
 
 {
-    IntMasterDisable();
-    //System_printf("Entered Main()\n");
+    IntMasterDisable(); // int is re emabled at the beginning of the highest priority task.
+    // init for all sub components.
     ADCInit();
     screenInit();
     ButtonInit();
-
-
     // hardware initialization goes in front of the tasks
     debugPinsInit();
+
     /* Start BIOS */
     BIOS_start();
 
     return (0);
 }
 
+// dummy class that should do nothing.
 void task0_func(UArg arg1, UArg arg2)
 {
     IntMasterEnable();

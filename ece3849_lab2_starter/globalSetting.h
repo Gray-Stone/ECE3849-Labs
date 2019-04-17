@@ -20,6 +20,8 @@
 
 #include <stdbool.h>
 
+// this need to be defined here for accessing.
+// read is direct access. write should go though fuctions.
 struct Setting_Str
 {
     uint16_t mVPerDiv  ; // set the voltage scale.
@@ -30,9 +32,10 @@ struct Setting_Str
     // gate name is called settingGate
 };
 
-
+// make it external accessable
 extern struct Setting_Str settings ;
 
+// functions to change contents, these all have built in gates.
 void settingsReset();
 bool changeVoltPerDiv(char direction );
 bool changeTimePerDiv(char direction );

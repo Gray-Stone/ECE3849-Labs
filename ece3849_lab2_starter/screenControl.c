@@ -83,6 +83,7 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
             }
          }
         else {
+            // the output mode for non FFT mode.
 
             fVoltsPerDiv = ((float) (settings.mVPerDiv) )/1000;
             fScale = (VIN_RANGE * PIXELS_PER_DIV)/((1 << ADC_BITS) * fVoltsPerDiv);
@@ -102,15 +103,6 @@ void ProcessingTask(UArg arg1, UArg arg2) { //4
 
 void DisplayTask(UArg arg1, UArg arg2) //6
 {
-//    tContext sContext;
-//    tRectangle rectFullScreen;
-//
-//    Crystalfontz128x128_Init(); // Initialize the LCD display driver
-//    Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP); // set screen orientation
-//    GrContextInit(&sContext, &g_sCrystalfontz128x128); // Initialize the grlib graphics context
-//    tRectangle rectFullScreenLocal = {0, 0, GrContextDpyWidthGet(&sContext)-1, GrContextDpyHeightGet(&sContext)-1};
-//    rectFullScreen = rectFullScreenLocal;
-//    GrContextFontSet(&sContext, &g_sFontFixed6x8); // select font
 
     int localWaveform[SCREENSIZE];
 

@@ -36,7 +36,7 @@ volatile uint32_t gADCErrors;                       // number of missed ADC dead
 
 uint16_t waveformBuffer[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
 
-uint16_t FFTBuffer[FFTBufferSize ];
+uint16_t FFTBuffer[FFTBufferSize ]; // the seperate buffer for FFT output.
 
 
 
@@ -132,14 +132,16 @@ void triggerFindTask (UArg arg1, UArg arg2)
         // wait for start
         Semaphore_pend(triggerFindSem,BIOS_WAIT_FOREVER);
 
-        if (settings.FFT)
+        if (settings.FFT)   // in the case of FFT mode
         {
             triggerIndex = gADCBufferIndex ;
-            for ( i=0;i< FFTBufferSize ; ++i )
+            for ( i=0;i< FFTBufferSize ; ++i )  // copy enough samples into FFT buffer for process.
                 FFTBuffer[i] = gADCBuffer[ ADC_BUFFER_WRAP(triggerIndex + i) ];
-            goto endloopTag;
+            goto endloopTag; // use go to to skip the next non FFT section
 
         }
+
+        // this section is the case of normal mode
         triggerLevel = settings.triggerLevel;
         edgetype = settings.edge ;
 

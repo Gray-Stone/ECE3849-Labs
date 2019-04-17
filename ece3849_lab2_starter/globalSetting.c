@@ -12,18 +12,19 @@
 
  #include "sampler.h"
 
-
+// initialization of the setting struct.
  struct Setting_Str settings = {.mVPerDiv = 100 , .usPerDiv = 20 , .edge = 0 , .triggerLevel = ADC_OFFSET , .FFT = 0  }  ;
 
+ // reset all the paramters to defalt.
  void settingsReset()
 {
+     // use a gate to prevent reentary problem.
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
-
-    settings.mVPerDiv = 500 ;
-    settings.usPerDiv = 20 ;
-    settings.edge = 0 ;
-    settings.triggerLevel = ADC_OFFSET;
+        settings.mVPerDiv = 500 ;
+        settings.usPerDiv = 20 ;
+        settings.edge = 0 ;
+        settings.triggerLevel = ADC_OFFSET;
     GateMutex_leave(settingGate, keySettingGate);
  }
 
@@ -32,28 +33,30 @@
 
  bool changeVoltPerDiv(char direction )
 {
+    // opeartaion is a long read modify write process. need protection
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
-    // semaphore check!
-    // return false if can't access it.
-    switch (settings.mVPerDiv)
-    {
-    case 100: settings.mVPerDiv = direction ? 200 : 100; break;
-    case 200: settings.mVPerDiv = direction ? 500 : 100; break;
-    case 500: settings.mVPerDiv = direction ? 1000 : 200; break;
-    case 1000: settings.mVPerDiv = direction ? 1000 : 500; break;
-    default : settings.mVPerDiv = 500;
-    }
+        // return false if can't access it.
+    // easier to switch through things by switch statements.
+        switch (settings.mVPerDiv)
+        {
+            case 100: settings.mVPerDiv = direction ? 200 : 100; break;
+            case 200: settings.mVPerDiv = direction ? 500 : 100; break;
+            case 500: settings.mVPerDiv = direction ? 1000 : 200; break;
+            case 1000: settings.mVPerDiv = direction ? 1000 : 500; break;
+            default : settings.mVPerDiv = 500;
+        }
 
      GateMutex_leave(settingGate, keySettingGate);
     return true;
 }
 
+ // simple function to change one item.
  bool changeTriggerEdge()
 {
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
-    settings.edge^=0x01 ;
+    settings.edge^=0x01 ;   // simpliy flip the dege
     GateMutex_leave(settingGate, keySettingGate);
 }
 
@@ -61,7 +64,7 @@ bool changeFFTMode()
 {
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
-     settings.FFT^=0x01 ;
+     settings.FFT^=0x01 ;   // siplify flip the state
      GateMutex_leave(settingGate, keySettingGate);
 }
 
@@ -71,6 +74,7 @@ bool changeFFTMode()
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
 
+    // fucntion is not used, left blank for space holding.
 
  //    switch (oldTimePerDiv)
 //    {
