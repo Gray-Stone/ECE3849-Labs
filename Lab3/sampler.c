@@ -29,7 +29,7 @@
 
 
 extern uint32_t gSystemClock;   // [Hz] system clock frequency
-volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
+//volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 uint16_t waveformBuffer[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
@@ -189,10 +189,10 @@ void ADC_ISR(UArg arg)  // DMA (lab3)
 // the trigger fix function for DMA
 int32_t getADCBufferIndex(void)
 {
-    if (settings.DMA_Software == 0 )
-    {
-        return gADCBufferIndex;
-    }
+//    if (settings.DMA_Software == 0 )
+//    {
+//        return gADCBufferIndex;
+//    }
     int32_t index;
     if (gDMAPrimary) {  // DMA is currently in the primary channel
         index = ADC_BUFFER_SIZE/2 - 1 -

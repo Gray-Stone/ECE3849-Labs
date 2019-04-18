@@ -15,7 +15,7 @@
 
 void screenInit();
 void drawScreen( uint16_t * samplePointer , uint16_t length, uint16_t vPerDiv , char edgetype, float cpu_load);
-
+uint32_t measure_ISR_CPU(void);
 
 
 
