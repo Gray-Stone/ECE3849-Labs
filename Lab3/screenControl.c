@@ -13,6 +13,10 @@
 #include <string.h>
 #include "Crystalfontz128x128_ST7735.h"
 
+#include "driverlib/timer.h"
+#include "inc/hw_memmap.h"
+#include "driverlib/sysctl.h"
+
 #include <math.h>
 #include "kiss_fft.h"
 #include "_kiss_fft_guts.h"
@@ -30,7 +34,15 @@ int processedWaveform[SCREENSIZE];
 float w[NFFT]; //window function values
 volatile bool processedFlag = false ; // false is good for write. True is good for read
 
-
+uint32_t measure_ISR_CPU(void)
+{
+    uint32_t i = 0;
+    TimerIntClear(TIMER3_BASE, TIMER_TIMA_TIMEOUT);
+    TimerEnable(TIMER3_BASE, TIMER_A); // start one-shot timer
+    while (!(TimerIntStatus(TIMER3_BASE, false) & TIMER_TIMA_TIMEOUT))
+        i++;
+    return i;
+}
 
 void screenInit()
 {
@@ -108,6 +120,19 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
     int i, pastY;
 
+    // initialize timer 3 in one-shot mode for polled timing
+    uint32_t gSystemClock = SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 120000000);
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
+    TimerDisable(TIMER3_BASE, TIMER_BOTH);
+    TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT);
+    TimerLoadSet(TIMER3_BASE, TIMER_A, (gSystemClock/100) - 1); //
+
+    uint32_t count_unloaded = measure_ISR_CPU();
+    uint32_t count_loaded = 0;
+    float cpu_load = 0;
+
+
     while(1) {
         Semaphore_pend(displaySem,BIOS_WAIT_FOREVER);
 
@@ -145,7 +170,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
         }
         GrContextForegroundSet(&sContext, ClrWhite); //white text
         char str1[50];   // string buffer line 1
-        //char str2[50];  //string buffer line 2
+        char str2[50];  //string buffer line 2
         char edgeString[10]; //string buffer for edge display string
         char voltString[10]; //string buffer for voltage scale display string
 
@@ -164,11 +189,14 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
             snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
         }
-        //snprintf(str2, 50, "CPU Load: %.5f%", 0);//cpu_load*100); //Settings status bar
+        snprintf(str2, 50, "CPU Load: %.5f%", cpu_load*100); //Settings status bar
         GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
-        //GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
+        GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
 
         GrFlush(&sContext); // flush the frame buffer to the LCD
+
+        count_loaded = measure_ISR_CPU();
+        cpu_load = 1.0f - (float)count_loaded/count_unloaded; // compute CPU load
 
     }
 
