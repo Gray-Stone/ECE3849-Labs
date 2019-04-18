@@ -127,10 +127,6 @@ void ADCDMAInit()
 
 
 
-
-
-
-
 // ADC ISR
 /*
 void ADC_ISR(UArg arg)
@@ -159,6 +155,8 @@ volatile bool gDMAPrimary = true; // is DMA occurring in the primary channel?
 
 void ADC_ISR(UArg arg)  // DMA (lab3)
 {
+    debugPin0= 1;
+
     ADCIntClearEx(ADC1_BASE, ADC_INT_DMA_SS0); // clear the ADC1 sequence 0 DMA interrupt flag  ---> should be correct
 
     static IArg keySettingGate;
@@ -187,6 +185,7 @@ void ADC_ISR(UArg arg)  // DMA (lab3)
     if (!uDMAChannelIsEnabled(UDMA_SEC_CHANNEL_ADC10)) {
         uDMAChannelEnable(UDMA_SEC_CHANNEL_ADC10);  // re-enable the DMA channel
     }
+    debugPin0 = 0;
 }
 
 // the trigger fix function for DMA
@@ -232,6 +231,10 @@ void triggerFindTask (UArg arg1, UArg arg2)
 
     volatile temp ;
     temp +=1;
+
+    IntMasterEnable();
+
+
     while(1)
     {
         // wait for start

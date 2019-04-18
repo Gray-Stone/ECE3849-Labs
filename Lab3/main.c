@@ -60,7 +60,6 @@ int main(void)
     count_unloaded = measure_ISR_CPU();
 
     /* Start BIOS */
-    IntMasterEnable();
     BIOS_start();
 
     return (0);
