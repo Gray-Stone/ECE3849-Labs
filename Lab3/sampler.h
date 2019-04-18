@@ -47,6 +47,7 @@ void ADC_ISR(UArg arg);
 
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
 void ADCDMAInit();
+int32_t getADCBufferIndex(void);
 
 
 
