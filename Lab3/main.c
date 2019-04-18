@@ -16,11 +16,16 @@
 #include <stdbool.h>
 #include "driverlib/interrupt.h"
 
+#include "driverlib/timer.h"
+#include "inc/hw_memmap.h"
+#include "driverlib/sysctl.h"
+
 #include "sampler.h"
 #include "buttons.h"
 #include "screenControl.h"
 
 uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
+uint32_t count_unloaded;
 
 /*
  *  ======== main ========
@@ -36,6 +41,14 @@ int main(void)
     ButtonInit();
     // hardware initialization goes in front of the tasks
     debugPinsInit();
+
+    //setup for CPU measurement
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
+    TimerDisable(TIMER3_BASE, TIMER_BOTH);
+    TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT);
+    TimerLoadSet(TIMER3_BASE, TIMER_A, (120000000/100) - 1);
+
+    count_unloaded = measure_ISR_CPU();
 
     /* Start BIOS */
     BIOS_start();

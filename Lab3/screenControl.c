@@ -30,6 +30,8 @@
 tContext sContext;
 tRectangle rectFullScreen;
 
+extern uint32_t count_unloaded;
+
 int processedWaveform[SCREENSIZE];
 float w[NFFT]; //window function values
 volatile bool processedFlag = false ; // false is good for write. True is good for read
@@ -120,15 +122,8 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
     int i, pastY;
 
-    // initialize timer 3 in one-shot mode for polled timing
-    uint32_t gSystemClock = SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 120000000);
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
-    TimerDisable(TIMER3_BASE, TIMER_BOTH);
-    TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT);
-    TimerLoadSet(TIMER3_BASE, TIMER_A, (gSystemClock/100) - 1); //
 
-    uint32_t count_unloaded = measure_ISR_CPU();
     uint32_t count_loaded = 0;
     float cpu_load = 0;
 
