@@ -231,6 +231,8 @@ void triggerFindTask (UArg arg1, UArg arg2)
     uint16_t triggerLevel ;
     char edgetype ;
 
+    volatile temp ;
+    temp +=1;
     while(1)
     {
         // wait for start
