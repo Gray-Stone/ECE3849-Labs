@@ -30,6 +30,8 @@ struct Setting_Str
     uint16_t triggerLevel ;
     char FFT;
     // gate name is called settingGate
+    char DMA_Software; // 0 for Software, 1 for DMA     // flag to check which way to get ADC pointer.
+
 };
 
 // make it external accessable

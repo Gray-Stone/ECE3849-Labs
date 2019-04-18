@@ -40,10 +40,13 @@ uint16_t FFTBuffer[FFTBufferSize ]; // the seperate buffer for FFT output.
 #pragma DATA_ALIGN(gDMAControlTable, 1024) // address alignment required
 tDMAControlTable gDMAControlTable[64];     // uDMA control table (global)
 
+int32_t getADCBufferIndex(void);
 
 // Direct ADC trigger ISR init
 void ADCInit()
 {
+    settings.DMA_Software = 0;
+
     // Initialize ADC1 and input peripheral for lab 1, step 2:
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP); //AIN3->PE0 is the input pin
     GPIOPinTypeADC(GPIO_PORTP_BASE, GPIO_PIN_0); // GPIO setup for analog input AIN3
@@ -70,6 +73,8 @@ void ADCInit()
 
 void ADCDMAInit()
 {
+    settings.DMA_Software = 1;
+
     // ADC part
     // Initialize ADC1 and input peripheral for lab 1, step 2:
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP); //AIN3->PE0 is the input pin
@@ -130,7 +135,6 @@ void ADCDMAInit()
 
 void ADC_ISR(UArg arg)
 {
-    //System_printf("Entered ADC_ISR\n");
 
     ADC1_ISC_R |=1 ; // clear ADC1 sequence0 interrupt flag in the ADCISC register
 #ifdef SampleTIMING
@@ -174,20 +178,29 @@ void DMA_ISR(void)  // DMA (lab3)
     }
 }
 
+// the trigger fix function for DMA
+int32_t getADCBufferIndex(void)
+{
+    if (settings.DMA_Software == 1 )
+    {
+        return gADCBufferIndex;
+    }
+    int32_t index;
+    if (gDMAPrimary) {  // DMA is currently in the primary channel
+        index = ADC_BUFFER_SIZE/2 - 1 -
+                uDMAChannelSizeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_PRI_SELECT);
+    }
+    else {              // DMA is currently in the alternate channel
+        index = ADC_BUFFER_SIZE - 1 -
+                uDMAChannelSizeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_ALT_SELECT);
+    }
+    return index;
+}
 
 
-
-
-
-
-
-
-
-
-
+// the processing Task
 
 bool triggerFound = false ;// determent if a trigger is found, reset to False every loop
-
 
 // go though the gathered waveform trying to find a trigger case. priority 14
 //trigger on triggerFindSem
@@ -210,7 +223,7 @@ void triggerFindTask (UArg arg1, UArg arg2)
 
         if (settings.FFT)   // in the case of FFT mode
         {
-            triggerIndex = gADCBufferIndex ;
+            triggerIndex = getADCBufferIndex() ;
             for ( i=0;i< FFTBufferSize ; ++i )  // copy enough samples into FFT buffer for process.
                 FFTBuffer[i] = gADCBuffer[ ADC_BUFFER_WRAP(triggerIndex + i) ];
             goto endloopTag; // use go to to skip the next non FFT section
@@ -223,7 +236,7 @@ void triggerFindTask (UArg arg1, UArg arg2)
 
 
         //initialize the trigger index, and preserve it:
-        triggerIndex = ADC_BUFFER_WRAP(gADCBufferIndex - 64);   //half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
+        triggerIndex = ADC_BUFFER_WRAP(getADCBufferIndex() - 64);   //half a screen (128/2 = 64) behind gADCBufferIndex (most recent sample index in FIFO)
         triggerIndexInit = triggerIndex;                        //log the initial trigger index, if nothing found the initial index is going to be used
         startIndex = ADC_BUFFER_WRAP( triggerIndexInit - (SCREENSIZE/2) );  // starting point for recording waveform.
 
