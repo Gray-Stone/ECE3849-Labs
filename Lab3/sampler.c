@@ -92,7 +92,7 @@ void ADCDMAInit()
     ADCSequenceStepConfigure(ADC1_BASE, 0, 0,  ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);// in the 0th step, sample channel 3 (AIN3)
                                   // enable interrupt, and make it the end of sequence
     ADCSequenceEnable(ADC1_BASE, 0);       // enable the sequence.  it is now sampling
-    ADCIntEnable(ADC1_BASE, 0);            // enable sequence 0 interrupt in the ADC1 peripheral
+    //ADCIntEnable(ADC1_BASE, 0);            // enable sequence 0 interrupt in the ADC1 peripheral
 
     // DMA part
 
