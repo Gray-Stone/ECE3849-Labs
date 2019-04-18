@@ -162,7 +162,7 @@ void ADC_ISR(UArg arg)  // DMA (lab3)
     ADCIntClearEx(ADC1_BASE, ADC_INT_DMA_SS0); // clear the ADC1 sequence 0 DMA interrupt flag  ---> should be correct
 
     static IArg keySettingGate;
-    keySettingGate = GateMutex_enter(gateMutex1);
+    keySettingGate = GateHwi_enter(gateHwi0);
     // Check the primary DMA channel for end of transfer, and restart if needed.
     if (uDMAChannelModeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_PRI_SELECT) ==
             UDMA_MODE_STOP) {
@@ -181,7 +181,7 @@ void ADC_ISR(UArg arg)  // DMA (lab3)
                                (void*)&gADCBuffer[ADC_BUFFER_SIZE/2], ADC_BUFFER_SIZE/2); // restart the primary channel (same as setup)
         gDMAPrimary = true;    // DMA is currently occurring in the alternate buffer
     }
-    GateMutex_leave(gateMutex1, keySettingGate);
+    GateHwi_leave(gateHwi0, keySettingGate);
 
     // The DMA channel may be disabled if the CPU is paused by the debugger.
     if (!uDMAChannelIsEnabled(UDMA_SEC_CHANNEL_ADC10)) {
@@ -197,7 +197,7 @@ int32_t getADCBufferIndex(void)
 //        return gADCBufferIndex;
 //    }
     static IArg keySettingGate;
-    keySettingGate = GateMutex_enter(gateMutex1);
+    keySettingGate = GateHwi_enter(gateHwi0);
 
     int32_t index;
     if (gDMAPrimary) {  // DMA is currently in the primary channel
@@ -208,7 +208,7 @@ int32_t getADCBufferIndex(void)
         index = ADC_BUFFER_SIZE - 1 -
                 uDMAChannelSizeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_ALT_SELECT);
     }
-    GateMutex_leave(gateMutex1, keySettingGate);
+    GateHwi_leave(gateHwi0, keySettingGate);
     return index;
 }
 
