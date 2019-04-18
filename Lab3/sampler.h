@@ -44,8 +44,6 @@ extern uint16_t FFTBuffer[FFTBufferSize ];
 
 void ADCInit();
 void ADC_ISR(UArg arg);
-void alwaysTriggerADC(void);
-void timerTriggerADC(uint32_t denominator);
 
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
 
