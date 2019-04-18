@@ -132,7 +132,7 @@ void ADCDMAInit()
 
 
 // ADC ISR
-
+/*
 void ADC_ISR(UArg arg)
 {
 
@@ -152,12 +152,12 @@ void ADC_ISR(UArg arg)
 #endif
 
 }
-
+*/
 // DMA ISR
 
 volatile bool gDMAPrimary = true; // is DMA occurring in the primary channel?
 
-void DMA_ISR(void)  // DMA (lab3)
+void ADC_ISR(UArg arg)  // DMA (lab3)
 {
     ADCIntClearEx(ADC1_BASE, ADC_INT_DMA_SS0); // clear the ADC1 sequence 0 DMA interrupt flag  ---> should be correct
 
@@ -189,7 +189,7 @@ void DMA_ISR(void)  // DMA (lab3)
 // the trigger fix function for DMA
 int32_t getADCBufferIndex(void)
 {
-    if (settings.DMA_Software == 1 )
+    if (settings.DMA_Software == 0 )
     {
         return gADCBufferIndex;
     }

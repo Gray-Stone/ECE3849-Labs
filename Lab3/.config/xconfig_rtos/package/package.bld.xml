@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="GBK"?>
+<?xml version="1.0" encoding="windows-1252"?>
 <!--  This file conforms to the DTD xdc/bld/build.dtd -->
 <package name="xconfig_rtos" version="" producerId="undefined">
     <units>
@@ -7,7 +7,7 @@
         <srcFile name="package/cfg/rtos_pem4f.c"/>
     </sources>
     <configscripts>
-        <srcFile name="A:/WPIWork/ECE3849/Labs/ece3849_lab2_starter/rtos.cfg"/>
+        <srcFile name="C:/Users/Edward/Documents/WPI/Junior/D_Term/ECE_3849/Labs/ECE3849-Labs/Lab3/rtos.cfg"/>
     </configscripts>
     <makefiles>
         <srcFile name="package.mak" src="package.bld"/>
@@ -44,7 +44,7 @@
         isPartial="false"
         xCfgScript="package/cfg/rtos_pem4f.cfg"
         xCfgPrefix="package/cfg/rtos_pem4f"
-        cfgScript="A:/WPIWork/ECE3849/Labs/ece3849_lab2_starter/rtos.cfg"
+        cfgScript="C:/Users/Edward/Documents/WPI/Junior/D_Term/ECE_3849/Labs/ECE3849-Labs/Lab3/rtos.cfg"
         cfgArgs="null"
         />
     </configurations>
@@ -56,7 +56,7 @@
         profile="release"
         xCfgScript="package/cfg/rtos_pem4f.cfg"
         xCfgPrefix="package/cfg/rtos_pem4f"
-        cfgScript="A:/WPIWork/ECE3849/Labs/ece3849_lab2_starter/rtos.cfg"
+        cfgScript="C:/Users/Edward/Documents/WPI/Junior/D_Term/ECE_3849/Labs/ECE3849-Labs/Lab3/rtos.cfg"
         cfgArgs="null"
         />
     </executables>

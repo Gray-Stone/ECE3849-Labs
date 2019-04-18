@@ -36,7 +36,8 @@ int main(void)
 {
     IntMasterDisable(); // int is re emabled at the beginning of the highest priority task.
     // init for all sub components.
-    ADCInit();
+    //ADCInit();
+    ADCDMAInit();
     screenInit();
     ButtonInit();
     // hardware initialization goes in front of the tasks
