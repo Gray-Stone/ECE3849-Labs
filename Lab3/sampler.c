@@ -222,7 +222,6 @@ bool triggerFound = false ;// determent if a trigger is found, reset to False ev
 void triggerFindTask (UArg arg1, UArg arg2)
 {
 //    ADCInit();
-    IntMasterEnable();
 
     uint32_t i =0;
     int32_t triggerIndex,  triggerIndexInit ,startIndex ;   // sotre the trigger locations.

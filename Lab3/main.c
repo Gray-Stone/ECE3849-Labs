@@ -25,6 +25,11 @@
 #include "screenControl.h"
 #include "hwDebug.h"
 
+#include "inc/tm4c1294ncpdt.h"
+#include "driverlib/gpio.h"
+
+
+
 uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
 uint32_t count_unloaded;
 
@@ -44,6 +49,8 @@ int main(void)
     // hardware initialization goes in front of the tasks
     debugPinsInit();
 
+
+
     //setup for CPU measurement
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
     TimerDisable(TIMER3_BASE, TIMER_BOTH);
@@ -53,6 +60,7 @@ int main(void)
     count_unloaded = measure_ISR_CPU();
 
     /* Start BIOS */
+    IntMasterEnable();
     BIOS_start();
 
     return (0);
