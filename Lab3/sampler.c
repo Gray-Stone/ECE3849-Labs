@@ -121,7 +121,7 @@ void ADCDMAInit()
 
 
     ADCSequenceDMAEnable(ADC1_BASE, 0); // enable DMA for ADC1 sequence 0
-    ADCIntEnableEx(...);                // enable ADC1 sequence 0 DMA interrupt
+    ADCIntEnableEx(ADC1_BASE, ADC_INT_DMA_SS0); // enable ADC1 sequence 0 DMA interrupt
 
 }
 
@@ -159,18 +159,26 @@ volatile bool gDMAPrimary = true; // is DMA occurring in the primary channel?
 
 void DMA_ISR(void)  // DMA (lab3)
 {
-    ADCIntClearEx(...); // clear the ADC1 sequence 0 DMA interrupt flag
+    ADCIntClearEx(ADC1_BASE, ADC_INT_DMA_SS0); // clear the ADC1 sequence 0 DMA interrupt flag  ---> should be correct
 
     // Check the primary DMA channel for end of transfer, and restart if needed.
     if (uDMAChannelModeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_PRI_SELECT) ==
             UDMA_MODE_STOP) {
-        uDMAChannelTransferSet(...); // restart the primary channel (same as setup)
+        uDMAChannelTransferSet(UDMA_SEC_CHANNEL_ADC10 | UDMA_PRI_SELECT,
+                               UDMA_MODE_PINGPONG, (void*)&ADC1_SSFIFO0_R,
+                               (void*)&gADCBuffer[0], ADC_BUFFER_SIZE/2); // restart the primary channel (same as setup)
         gDMAPrimary = false;    // DMA is currently occurring in the alternate buffer
     }
 
     // Check the alternate DMA channel for end of transfer, and restart if needed.
     // Also set the gDMAPrimary global.
-    <...>
+    if (uDMAChannelModeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_ALT_SELECT) ==
+            UDMA_MODE_STOP) {
+        uDMAChannelTransferSet(UDMA_SEC_CHANNEL_ADC10 | UDMA_ALT_SELECT,
+                               UDMA_MODE_PINGPONG, (void*)&ADC1_SSFIFO0_R,
+                               (void*)&gADCBuffer[ADC_BUFFER_SIZE/2], ADC_BUFFER_SIZE/2); // restart the primary channel (same as setup)
+        gDMAPrimary = true;    // DMA is currently occurring in the alternate buffer
+    }
 
     // The DMA channel may be disabled if the CPU is paused by the debugger.
     if (!uDMAChannelIsEnabled(UDMA_SEC_CHANNEL_ADC10)) {
