@@ -116,7 +116,7 @@ void ADCDMAInit()
 
 
     ADCSequenceDMAEnable(ADC1_BASE, 0); // enable DMA for ADC1 sequence 0
-    ADCIntEnableEx(...);                // enable ADC1 sequence 0 DMA interrupt
+    ADCIntEnableEx(ADC1_BASE, ADC_INT_DMA_SS0); // enable ADC1 sequence 0 DMA interrupt
 
 }
 
