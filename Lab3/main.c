@@ -23,6 +23,7 @@
 #include "sampler.h"
 #include "buttons.h"
 #include "screenControl.h"
+#include "hwDebug.h"
 
 uint32_t gSystemClock = 120000000; // [Hz] system clock frequency
 uint32_t count_unloaded;

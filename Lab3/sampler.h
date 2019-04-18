@@ -32,7 +32,7 @@
 
 
 
-extern volatile int32_t gADCBufferIndex ;  // latest sample index
+//extern volatile int32_t gADCBufferIndex ;  // latest sample index
 extern volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 extern volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 
@@ -46,6 +46,7 @@ void ADCInit();
 void ADC_ISR(UArg arg);
 
 bool triggerCheck (int16_t sample, int16_t sampleFuture, int16_t triggerLevel, char edgetype);
+void ADCDMAInit();
 
 
 
