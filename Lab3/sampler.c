@@ -149,6 +149,31 @@ void ADC_ISR(UArg arg)
 
 }
 
+// DMA ISR
+
+volatile bool gDMAPrimary = true; // is DMA occurring in the primary channel?
+
+void DMA_ISR(void)  // DMA (lab3)
+{
+    ADCIntClearEx(...); // clear the ADC1 sequence 0 DMA interrupt flag
+
+    // Check the primary DMA channel for end of transfer, and restart if needed.
+    if (uDMAChannelModeGet(UDMA_SEC_CHANNEL_ADC10 | UDMA_PRI_SELECT) ==
+            UDMA_MODE_STOP) {
+        uDMAChannelTransferSet(...); // restart the primary channel (same as setup)
+        gDMAPrimary = false;    // DMA is currently occurring in the alternate buffer
+    }
+
+    // Check the alternate DMA channel for end of transfer, and restart if needed.
+    // Also set the gDMAPrimary global.
+    <...>
+
+    // The DMA channel may be disabled if the CPU is paused by the debugger.
+    if (!uDMAChannelIsEnabled(UDMA_SEC_CHANNEL_ADC10)) {
+        uDMAChannelEnable(UDMA_SEC_CHANNEL_ADC10);  // re-enable the DMA channel
+    }
+}
+
 
 
 
