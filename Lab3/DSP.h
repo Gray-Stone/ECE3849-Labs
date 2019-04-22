@@ -9,5 +9,7 @@
 #define DSP_H_
 
 
+void DSPInit(void );
+
 
 #endif /* DSP_H_ */

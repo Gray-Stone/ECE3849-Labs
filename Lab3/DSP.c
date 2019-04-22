@@ -31,6 +31,8 @@
 
 void DSPInit(void )
 {
+    setupCompartor();
+    setupCapture();
 
 }
 
