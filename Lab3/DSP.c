@@ -26,8 +26,9 @@
 #include "inc/tm4c1294ncpdt.h"
 
 #include "DSP.h"
+#include "hwDebug.h"
 
-
+uint32_t period, last_count, counted_periods, accumulated_period;
 
 
 void DSPInit(void )
@@ -53,6 +54,7 @@ void setupCompartor()
     GPIOPinTypeComparatorOutput(GPIO_PORTD_BASE, GPIO_PIN_1);
     GPIOPinConfigure(GPIO_PD1_C1O);
 
+
 }
 
 
@@ -73,5 +75,25 @@ void setupCapture ()
     TimerPrescaleSet(TIMER0_BASE, TIMER_A, 0xff); // use maximum prescale value
     TimerIntEnable(TIMER0_BASE, TIMER_CAPA_EVENT);
     TimerEnable(TIMER0_BASE, TIMER_A);
+}
+
+
+void captureHwi_ISR(UArg arg) {
+    TimerIntClear(TIMER0_BASE, TIMER_CAPA_EVENT); // clear timer 0a capture interrupt flag
+
+    uint32_t count = TimerValueGet(TIMER0_BASE, TIMER_A); //read captured timer count
+
+    period = (count - last_count) & 0xffffff; //deal w/ overflow
+    last_count = count;
+
+    accumulated_period += period;
+    counted_periods++;
+
+    debugPin0= 1;
+    debugPin0= 0;
+}
+
+void periodClockSwi(UArg arg) {
+
 }
 
