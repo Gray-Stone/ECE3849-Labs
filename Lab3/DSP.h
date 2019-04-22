@@ -10,6 +10,7 @@
 
 
 void DSPInit(void );
+void setupCompartor();
 
 
 #endif /* DSP_H_ */

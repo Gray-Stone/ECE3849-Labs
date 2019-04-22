@@ -48,6 +48,7 @@ int main(void)
     ButtonInit();
     // hardware initialization goes in front of the tasks
     debugPinsInit();
+    DSPInit();
 
 
 
