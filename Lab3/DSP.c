@@ -96,26 +96,28 @@ void captureHwi_ISR(UArg arg) {
 
 }
 
-void periodClockSwi(UArg arg1, UArg arg2) {
+void periodClockSwi(UArg arg0) {
 
     Semaphore_post(freqSem);
 
 
-    debugPin0= 1;
-    debugPin0= 0;
+    debugPin0 ^= 1;
+//    debugPin0= 0;
 }
 
-void FrequencyTask()
+void FrequencyTask(UArg arg1, UArg arg2)
 {
-    Semaphore_pend(freqSem,BIOS_WAIT_FOREVER);
-    static IArg keySettingGate;
-    keySettingGate = GateHwi_enter(gateHwi0);
+    while(1){
+        Semaphore_pend(freqSem,BIOS_WAIT_FOREVER);
+        static IArg keySettingGate;
+        keySettingGate = GateHwi_enter(gateHwi0);
 
-    avgPeriod =    accumulated_period / counted_periods ;
-    accumulated_period =0;
-    counted_periods=0;
+        avgPeriod =    accumulated_period / counted_periods ;
+        accumulated_period =0;
+        counted_periods=0;
 
-    GateHwi_leave(gateHwi1, keySettingGate);
+        GateHwi_leave(gateHwi1, keySettingGate);
+    }
 
 }
 
