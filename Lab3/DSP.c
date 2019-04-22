@@ -38,17 +38,17 @@ void setupCompartor()
 {
     // part of frequency counter
     SysCtlPeripheralEnable(SYSCTL_PERIPH_COMP0);
-    ComparatorRefSet(COMP_BASE, ...);
-    ComparatorConfigure(COMP_BASE, 1, ...);
+    ComparatorRefSet(COMP_BASE, COMP_REF_1_65V);
+    ComparatorConfigure(COMP_BASE, 1, COMP_TRIG_NONE | COMP_ASRCP_REF | COMP_OUTPUT_NORMAL);
 
-    // configure GPIO for comparator input C1- at BoosterPack Connector #1 pin 3
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIO?);
-    GPIOPinTypeComparator(...);
+    // configure GPIO for comparator input C1- at BoosterPack Connector #1 pin 3    //pp0
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP);
+    GPIOPinTypeComparator(GPIO_PORTP_BASE, GPIO_PIN_0);
 
-    // configure GPIO for comparator output C1o at BoosterPack Connector #1 pin 15
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIO?);
-    GPIOPinTypeComparatorOutput(...);
-    GPIOPinConfigure(...);
+    // configure GPIO for comparator output C1o at BoosterPack Connector #1 pin 15 //pq2/pa3
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    GPIOPinTypeComparatorOutput(GPIO_PORTA_BASE, GPIO_PIN_3);
+    GPIOPinConfigure(GPIO_PA3_T1CCP1);
 
 }
 
