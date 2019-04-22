@@ -28,7 +28,7 @@
 #include "DSP.h"
 #include "hwDebug.h"
 
-uint32_t period, last_count, counted_periods, accumulated_period;
+uint32_t period, last_count, counted_periods, accumulated_period , avgPeriod;
 
 
 void DSPInit(void )
@@ -86,14 +86,36 @@ void captureHwi_ISR(UArg arg) {
     period = (count - last_count) & 0xffffff; //deal w/ overflow
     last_count = count;
 
+    static IArg keySettingGate;
+    keySettingGate = GateHwi_enter(gateHwi0);
+
     accumulated_period += period;
     counted_periods++;
+
+    GateHwi_leave(gateHwi1, keySettingGate);
+
+}
+
+void periodClockSwi(UArg arg1, UArg arg2) {
+
+    Semaphore_post(freqSem);
+
 
     debugPin0= 1;
     debugPin0= 0;
 }
 
-void periodClockSwi(UArg arg) {
+void FrequencyTask()
+{
+    Semaphore_pend(freqSem,BIOS_WAIT_FOREVER);
+    static IArg keySettingGate;
+    keySettingGate = GateHwi_enter(gateHwi0);
+
+    avgPeriod =    accumulated_period / counted_periods ;
+    accumulated_period =0;
+    counted_periods=0;
+
+    GateHwi_leave(gateHwi1, keySettingGate);
 
 }
 
