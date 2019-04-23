@@ -26,6 +26,7 @@
 
 
 #include "globalSetting.h"
+#include "DSP.h"
 
 tContext sContext;
 tRectangle rectFullScreen;
@@ -125,6 +126,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
 
     uint32_t count_loaded = 0;
+    float measuredPeriod = 0;
     float cpu_load = 0;
 
 
@@ -139,6 +141,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
         }
 
         //drawGridStart = (settings.FFT) ? 0 : 3;
+        measuredPeriod = 120000000 / ( (float) avgPeriod);
 
 
         GrContextForegroundSet(&sContext, ClrBlack);
@@ -184,7 +187,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
             snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
         }
-        snprintf(str2, 50, "CPU Load: %.5f%", cpu_load*100); //Settings status bar
+        snprintf(str2, 50, "CPU:%.2f Hz:%.2f", cpu_load*100, measuredPeriod); //Settings status bar
         GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
         GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
 
