@@ -25,8 +25,11 @@
 
 #include "inc/tm4c1294ncpdt.h"
 
+#include <math.h>
+
 #include "DSP.h"
 #include "hwDebug.h"
+
 
 uint32_t period, last_count, counted_periods, accumulated_period , avgPeriod;
 
@@ -35,6 +38,7 @@ void DSPInit(void )
 {
     setupCompartor();
     setupCapture();
+
 
 }
 
@@ -139,6 +143,8 @@ uint32_t gPhaseIncrement = 166471600 ;     // phase increment for 18 kHz
 #define PWM_WAVEFORM_TABLE_SIZE (1 << PWM_WAVEFORM_INDEX_BITS)
 uint8_t gPWMWaveformTable[PWM_WAVEFORM_TABLE_SIZE] = {0};
 
+
+
 void PWMInit()
 {
     // use M0PWM1, at GPIO PF1, which is BoosterPack Connector #1 pin 40
@@ -160,6 +166,12 @@ void PWMInit()
     PWMIntEnable(PWM0_BASE, PWM_INT_GEN_0);
 
 //     generate sine wave table.
+    double phase_location, i;
+
+    for (i  = 0; i < PWM_WAVEFORM_TABLE_SIZE; i++) {
+        phase_location = i*2.0*M_PI/(PWM_WAVEFORM_TABLE_SIZE);
+        gPWMWaveformTable[(int)i] = (uint8_t) sin(phase_location);
+    }
 }
 
 
