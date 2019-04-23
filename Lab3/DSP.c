@@ -127,6 +127,18 @@ void FrequencyTask(UArg arg1, UArg arg2)
 
 #define PWM_PERIOD 258 // PWM period = 2^8 + 2 system clock cycles
 
+#include "inc/tm4c1294ncpdt.h"
+
+
+uint32_t gPhase = 0;              // phase accumulator
+uint32_t gPhaseIncrement = 166471600 ;     // phase increment for 18 kHz
+// 465Khz / 18Khz = 25.8 interrupts.
+// 2^32 / 25.8 = 166471600.62
+
+#define PWM_WAVEFORM_INDEX_BITS 10
+#define PWM_WAVEFORM_TABLE_SIZE (1 << PWM_WAVEFORM_INDEX_BITS)
+uint8_t gPWMWaveformTable[PWM_WAVEFORM_TABLE_SIZE] = {0};
+
 void PWMInit()
 {
     // use M0PWM1, at GPIO PF1, which is BoosterPack Connector #1 pin 40
@@ -146,11 +158,22 @@ void PWMInit()
     // enable PWM interrupt in the PWM peripheral
     PWMGenIntTrigEnable(PWM0_BASE, PWM_GEN_0, PWM_INT_CNT_ZERO);
     PWMIntEnable(PWM0_BASE, PWM_INT_GEN_0);
+
+//     generate sine wave table.
 }
 
 
 
 
+void PWM_ISR(UArg arg0)
+{
+    PWMGenIntClear(PWM0_BASE, PWM_INT_GEN_0 , PWM_INT_CNT_ZERO);  // clear PWM interrupt flag
+
+    gPhase += gPhaseIncrement;
+
+    // write directly to the Compare B register that determines the duty cycle
+    PWM0_0_CMPB_R = 1 + gPWMWaveformTable[gPhase >> (32 - PWM_WAVEFORM_INDEX_BITS)];
+}
 
 
 
