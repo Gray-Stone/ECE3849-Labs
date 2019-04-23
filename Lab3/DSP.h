@@ -21,6 +21,6 @@ void DSPInit(void );
 void setupCompartor();
 void setupCapture();
 
-extern uint32_t period, last_count, counted_periods, accumulated_period;
+extern uint32_t period, last_count, counted_periods, accumulated_period, avgPeriod;
 
 #endif /* DSP_H_ */
