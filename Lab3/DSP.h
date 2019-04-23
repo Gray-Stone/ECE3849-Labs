@@ -20,6 +20,7 @@
 void DSPInit(void );
 void setupCompartor();
 void setupCapture();
+void PWMInit();
 
 extern uint32_t period, last_count, counted_periods, accumulated_period;
 

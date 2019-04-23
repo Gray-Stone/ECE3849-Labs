@@ -24,6 +24,7 @@
 #include "buttons.h"
 #include "screenControl.h"
 #include "hwDebug.h"
+#include "DSP.h"
 
 #include "inc/tm4c1294ncpdt.h"
 #include "driverlib/gpio.h"
@@ -49,6 +50,8 @@ int main(void)
     // hardware initialization goes in front of the tasks
     debugPinsInit();
     DSPInit();
+    PWMInit();
+
 
 
 
