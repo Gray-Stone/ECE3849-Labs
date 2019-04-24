@@ -147,6 +147,14 @@ uint8_t gPWMWaveformTable[PWM_WAVEFORM_TABLE_SIZE] = {0};
 
 void PWMInit()
 {
+    //     generate sine wave table.
+        double phase_location, i;
+
+        for (i  = 0; i < PWM_WAVEFORM_TABLE_SIZE; i++) {
+            phase_location = i*2.0*M_PI/(PWM_WAVEFORM_TABLE_SIZE);
+            gPWMWaveformTable[(int)i] = (uint8_t) (64 + 64*sin(phase_location));
+        }
+
     // use M0PWM1, at GPIO PF1, which is BoosterPack Connector #1 pin 40
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
     GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_1); // PF1 = M0PWM1
@@ -165,13 +173,7 @@ void PWMInit()
     PWMGenIntTrigEnable(PWM0_BASE, PWM_GEN_0, PWM_INT_CNT_ZERO);
     PWMIntEnable(PWM0_BASE, PWM_INT_GEN_0);
 
-//     generate sine wave table.
-    double phase_location, i;
 
-    for (i  = 0; i < PWM_WAVEFORM_TABLE_SIZE; i++) {
-        phase_location = i*2.0*M_PI/(PWM_WAVEFORM_TABLE_SIZE);
-        gPWMWaveformTable[(int)i] = (uint8_t) sin(phase_location);
-    }
 }
 
 

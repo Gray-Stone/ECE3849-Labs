@@ -55,6 +55,7 @@ int main(void)
 
 
 
+
     //setup for CPU measurement
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
     TimerDisable(TIMER3_BASE, TIMER_BOTH);
