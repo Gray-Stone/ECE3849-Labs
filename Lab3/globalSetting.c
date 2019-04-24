@@ -56,7 +56,7 @@
 {
     static IArg keySettingGate;
     keySettingGate = GateMutex_enter(settingGate);
-    settings.edge^=0x01 ;   // simpliy flip the dege
+    settings.edge^=0x01 ;   // simply flip the edge
     GateMutex_leave(settingGate, keySettingGate);
 }
 

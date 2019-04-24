@@ -91,7 +91,7 @@ void captureHwi_ISR(UArg arg) {
     last_count = count;
 
     static IArg keySettingGate;
-    keySettingGate = GateHwi_enter(gateHwi0);
+    keySettingGate = GateHwi_enter(gateHwi1);
 
     accumulated_period += period;
     counted_periods++;
@@ -111,16 +111,17 @@ void periodClockSwi(UArg arg0) {
 
 void FrequencyTask(UArg arg1, UArg arg2)
 {
+    IArg keyGate;
+
     while(1){
         Semaphore_pend(freqSem,BIOS_WAIT_FOREVER);
-        static IArg keySettingGate;
-        keySettingGate = GateHwi_enter(gateHwi0);
+        keyGate = GateHwi_enter(gateHwi1);
 
         avgPeriod =    accumulated_period / counted_periods ;
         accumulated_period =0;
         counted_periods=0;
 
-        GateHwi_leave(gateHwi1, keySettingGate);
+        GateHwi_leave(gateHwi1, keyGate);
     }
 
 }
@@ -135,7 +136,7 @@ void FrequencyTask(UArg arg1, UArg arg2)
 
 
 uint32_t gPhase = 0;              // phase accumulator
-uint32_t gPhaseIncrement = 166471600 ;     // phase increment for 18 kHz
+uint32_t gPhaseIncrement = 166471600;     // phase increment for 18 kHz
 // 465Khz / 18Khz = 25.8 interrupts.
 // 2^32 / 25.8 = 166471600.62
 
@@ -181,7 +182,7 @@ void PWMInit()
 
 void PWM_ISR(UArg arg0)
 {
-    PWMGenIntClear(PWM0_BASE, PWM_INT_GEN_0 , PWM_INT_CNT_ZERO);  // clear PWM interrupt flag
+    PWMGenIntClear(PWM0_BASE, PWM_GEN_0 , PWM_INT_CNT_ZERO);  // clear PWM interrupt flag
 
     gPhase += gPhaseIncrement;
 
