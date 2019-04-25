@@ -29,7 +29,7 @@
 
 
 extern uint32_t gSystemClock;   // [Hz] system clock frequency
-//volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
+volatile int32_t gADCBufferIndex = ADC_BUFFER_SIZE - 1;  // latest sample index
 volatile uint16_t gADCBuffer[ADC_BUFFER_SIZE];           // circular buffer
 volatile uint32_t gADCErrors;                       // number of missed ADC deadlines
 uint16_t waveformBuffer[SCREENSIZE];  //TODO is waveform processing gonna use this as well?
@@ -62,6 +62,16 @@ void ADCInit()
     ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);    // specify the "Always" trigger
     ADCSequenceStepConfigure(ADC1_BASE, 0, 0,  ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);// in the 0th step, sample channel 3 (AIN3)
                                   // enable interrupt, and make it the end of sequence
+    //extra credit FIFO configuration:
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 0,  ADC_CTL_CH3);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 1,  ADC_CTL_CH3);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 2,  ADC_CTL_CH3);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 3,  ADC_CTL_CH3 | ADC_CTL_IE);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 4,  ADC_CTL_CH3);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 5,  ADC_CTL_CH3);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 6,  ADC_CTL_CH3);
+//    ADCSequenceStepConfigure(ADC1_BASE, 0, 7,  ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);
+
     ADCSequenceEnable(ADC1_BASE, 0);       // enable the sequence.  it is now sampling
     ADCIntEnable(ADC1_BASE, 0);            // enable sequence 0 interrupt in the ADC1 peripheral
 
@@ -140,9 +150,11 @@ void ADC_ISR(UArg arg)
         gADCErrors++;                   // count errors
         ADC1_OSTAT_R = ADC_OSTAT_OV0;   // clear overflow condition
     }
+    while (!(ADC1_SSFSTAT0_R | (1<<8)) ){
     gADCBuffer[
                gADCBufferIndex = ADC_BUFFER_WRAP(gADCBufferIndex + 1)
                ] = ADC1_SSFIFO0_R;               // read sample from the ADC1 sequence 0 FIFO
+    }
 #ifdef SampleTIMING
     debugPin0= 0;
 #endif
