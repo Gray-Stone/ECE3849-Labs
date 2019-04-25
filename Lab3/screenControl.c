@@ -187,7 +187,7 @@ void DisplayTask(UArg arg1, UArg arg2) //6
 
             snprintf(str1, 50, "%u uS  %s %s\0", 20, voltString, edgeString); //Settings status bar
         }
-        snprintf(str2, 50, "CPU:%.2f Hz:%.2f", cpu_load*100, measuredPeriod); //Settings status bar
+        snprintf(str2, 50, "CPU:%.1f Hz:%.3f", cpu_load*100, measuredPeriod); //Settings status bar
         GrStringDraw(&sContext, str1, /*length*/ -1, /*x*/ 0, /*y*/ 0, /*opaque*/ false); //draw top bar
         GrStringDraw(&sContext, str2, /*length*/ -1, /*x*/ 0, /*y*/ 120, /*opaque*/ false); //draw line 2 below line 1
 
