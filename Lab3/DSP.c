@@ -36,7 +36,9 @@ uint32_t period, last_count, counted_periods, accumulated_period , avgPeriod;
 
 void DSPInit(void )
 {
+    // setup the hardware compartor to make sinewave into squarewave
     setupCompartor();
+    // capture init for frequency counter
     setupCapture();
 
 
@@ -57,8 +59,6 @@ void setupCompartor()
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
     GPIOPinTypeComparatorOutput(GPIO_PORTD_BASE, GPIO_PIN_1);
     GPIOPinConfigure(GPIO_PD1_C1O);
-
-
 }
 
 
@@ -71,6 +71,7 @@ void setupCapture ()
     GPIOPinTypeTimer(GPIO_PORTD_BASE, GPIO_PIN_0);
     GPIOPinConfigure(GPIO_PD0_T0CCP0);
 
+    // setup timer
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
     TimerDisable(TIMER0_BASE, TIMER_BOTH);
     TimerConfigure(TIMER0_BASE, TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_CAP_TIME_UP);
@@ -84,12 +85,12 @@ void setupCapture ()
 
 void captureHwi_ISR(UArg arg) {
     TimerIntClear(TIMER0_BASE, TIMER_CAPA_EVENT); // clear timer 0a capture interrupt flag
-
     uint32_t count = TimerValueGet(TIMER0_BASE, TIMER_A); //read captured timer count
-
     period = (count - last_count) & 0xffffff; //deal w/ overflow
-    last_count = count;
+    last_count = count;     // preserve the count for next one
 
+    // gate protected accumulation of the overall period.
+    // use gate to prevent the overall period is reset by accident
     static IArg keySettingGate;
     keySettingGate = GateHwi_enter(gateHwi1);
 
@@ -115,6 +116,8 @@ void FrequencyTask(UArg arg1, UArg arg2)
 
     while(1){
         Semaphore_pend(freqSem,BIOS_WAIT_FOREVER);
+
+        // use HWI gate to stop the interrupt from channging the value of accumulated period.
         keyGate = GateHwi_enter(gateHwi1);
 
         avgPeriod =    accumulated_period / counted_periods ;
@@ -151,6 +154,7 @@ void PWMInit()
     //     generate sine wave table.
         double phase_location, i;
 
+        // populate the sine wave look up table
         for (i  = 0; i < PWM_WAVEFORM_TABLE_SIZE; i++) {
             phase_location = i*2.0*M_PI/(PWM_WAVEFORM_TABLE_SIZE);
             gPWMWaveformTable[(int)i] = (uint8_t) (64 + 64*sin(phase_location));
@@ -184,6 +188,7 @@ void PWM_ISR(UArg arg0)
 {
     PWMGenIntClear(PWM0_BASE, PWM_GEN_0 , PWM_INT_CNT_ZERO);  // clear PWM interrupt flag
 
+    // increment the phase to next votage point
     gPhase += gPhaseIncrement;
 
     // write directly to the Compare B register that determines the duty cycle
